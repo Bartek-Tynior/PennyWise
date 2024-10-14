@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct DashboardView: View {
+    @State private var isShowingCategory = false
+    @State private var isShowingTransaction = false
+
     @EnvironmentObject var authViewModel: AuthViewModel
     @State private var isExpanded = false
 
@@ -78,21 +81,41 @@ struct DashboardView: View {
                         .padding()
                         .background(RoundedRectangle(cornerRadius: 12).stroke(Color.gray.opacity(0.3), lineWidth: 1))
                     }
-                                    
+                    
                     Button(action: {
-                        // Add new category action
+                        isShowingCategory.toggle()
                     }) {
                         Text("Add new category")
                             .foregroundColor(.purple)
                     }
                     .padding()
+                    .sheet(isPresented: $isShowingCategory) {
+                        AddCategoryView()
+                    }
                 }
             }
             .padding()
-
-            Button("Sign Out") {
-                Task {
-                    try await authViewModel.signOut()
+        }
+        
+        // Floating Action Button (FAB)
+        ZStack {
+            HStack {
+                Spacer()
+                Button(action: {
+                    isShowingTransaction.toggle()
+                }) {
+                    Image(systemName: "plus")
+                        .font(.system(size: 24))
+                        .frame(width: 60, height: 60)
+                        .foregroundColor(.white)
+                        .background(Color.purple)
+                        .clipShape(Circle())
+                        .shadow(color: .gray.opacity(0.4), radius: 4, x: 2, y: 2)
+                }
+                .padding(.trailing, 20)
+                .padding(.bottom, 20)
+                .sheet(isPresented: $isShowingTransaction) {
+                    AddTransactionFlowView()
                 }
             }
         }

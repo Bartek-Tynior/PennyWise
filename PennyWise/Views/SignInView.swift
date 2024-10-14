@@ -67,12 +67,6 @@ struct SignInView: View {
             
             Spacer()
         }
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .principal) {
-                TopNavBar() // Logo in the navigation bar
-            }
-        }
     }
 }
 

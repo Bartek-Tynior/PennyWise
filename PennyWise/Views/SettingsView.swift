@@ -7,7 +7,14 @@
 import SwiftUI
 
 struct SettingsView: View {
+    
+    @EnvironmentObject var authViewModel: AuthViewModel
+    
     var body: some View {
-        Text("SettingsView")
+        Button("Sign Out") {
+            Task {
+                try await authViewModel.signOut()
+            }
+        }
     }
 }
