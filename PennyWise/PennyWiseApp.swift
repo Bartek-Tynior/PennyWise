@@ -9,9 +9,18 @@ import SwiftUI
 
 @main
 struct PennyWiseApp: App {
-    var body: some Scene {
-        WindowGroup {
-            ContentView()
+    
+    @StateObject var authViewModel = AuthViewModel()
+
+        var body: some Scene {
+            WindowGroup {
+                ContentView()
+                    .environmentObject(authViewModel)
+                    .onAppear {
+                        Task {
+                            await authViewModel.checkSession()
+                        }
+                    }
+            }
         }
-    }
 }
