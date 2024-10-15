@@ -13,6 +13,35 @@ struct AddCategoryView: View {
 
     var body: some View {
         VStack(spacing: 20) {
+            // Buttons at the top-right corner
+            HStack(spacing: 10) {
+                // Ellipsis Button
+                Button(action: {
+                    // Handle ellipsis action here
+                }) {
+                    Image(systemName: "ellipsis")
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundColor(.gray)
+                        .frame(width: 30, height: 30)
+                        .background(Color(UIColor.systemGray5))
+                        .clipShape(Circle())
+                }
+
+                // Close Button
+                Button(action: {
+                    // Handle close action here
+                }) {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundColor(.gray)
+                        .frame(width: 30, height: 30)
+                        .background(Color(UIColor.systemGray5))
+                        .clipShape(Circle())
+                }
+            }
+            .padding([.top, .trailing], 24)
+            .frame(maxWidth: .infinity, alignment: .topTrailing)
+            
             // Category Icon
             Image(systemName: "cart.fill") // Replace with your category icon
                 .resizable()

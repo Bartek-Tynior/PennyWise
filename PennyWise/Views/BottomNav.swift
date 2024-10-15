@@ -50,7 +50,7 @@ struct BottomNav: View {
     // Helper function to create nav items
     func navItem(icon: String, text: String, tab: Tab) -> some View {
         Button(action: {
-            withAnimation(.smooth) {
+            withAnimation(.spring) {
                 selectedTab = tab
             }
         }) {
