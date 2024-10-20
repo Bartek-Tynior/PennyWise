@@ -13,16 +13,28 @@ struct WelcomeView: View {
 
     var body: some View {
         VStack {
-            TopNavBar()
+            HStack(spacing: 0) {
+                Text("Penny")
+                    .font(.system(size: 30))
+                    .fontWeight(.semibold)
+                    .foregroundColor(.white)
+
+                Text("Wise.")
+                    .font(.system(size: 30))
+                    .fontWeight(.semibold)
+                    .foregroundColor(.purple)
+            }
             
             Spacer()
 
-            VStack(spacing: 40) {
+            VStack(alignment: .leading, spacing: 40) {
                 Text("Welcome to PennyWise 👋")
+                    .foregroundStyle(.gray)
                     .font(.title)
                     .multilineTextAlignment(.center)
 
                 Text("A simple & beautiful budgeting app designed to help you curb spending.")
+                    .foregroundStyle(.gray)
                     .font(.title2)
                     .multilineTextAlignment(.center)
             }
@@ -34,6 +46,7 @@ struct WelcomeView: View {
                     isShowingSignUp.toggle()
                 }) {
                     Text("Create Account")
+                        .bold()
                         .frame(maxWidth: .infinity)
                         .padding()
                         .background(Color.purple)
@@ -48,10 +61,11 @@ struct WelcomeView: View {
                     isShowingSignIn.toggle()
                 }) {
                     Text("Sign In")
+                        .bold()
                         .frame(maxWidth: .infinity)
                         .padding()
                         .background(Color.gray.opacity(0.2))
-                        .foregroundColor(.black)
+                        .foregroundColor(.white)
                         .cornerRadius(30)
                 }
                 .sheet(isPresented: $isShowingSignIn) {
@@ -61,12 +75,8 @@ struct WelcomeView: View {
             .padding(.horizontal, 40)
             .padding(.bottom, 40)
         }
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .principal) {
-                TopNavBar() // Logo in the navigation bar
-            }
-        }
+        .background(Color.black.opacity(0.9).edgesIgnoringSafeArea(.all))
+        .foregroundColor(.white)
     }
 }
 

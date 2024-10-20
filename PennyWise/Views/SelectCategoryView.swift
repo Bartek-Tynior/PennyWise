@@ -9,61 +9,135 @@ import SwiftUI
 
 struct SelectCategoryView: View {
     @Binding var selectedCategory: String?
-        var onAddTransaction: () -> Void
-        
-        let categories = [
-            ("Groceries", "cart.fill", Color.purple),
-            ("Rent", "house.fill", Color.green),
-            ("Transport", "car.fill", Color.blue)
-        ]
-        
-        var body: some View {
-            VStack {
+    @State private var transactionDescription: String = ""
+    @State private var currency: String = "EUR"
+    var onAddTransaction: () -> Void
+    
+    let categories = [
+        ("Groceries", "Groceries", Color.purple),
+        ("Rent", "Rent", Color.green),
+        ("Transport", "Transport", Color.blue)
+    ]
+    
+    var body: some View {
+        VStack {
+            
+            HStack {
+                Button {
+                    
+                } label: {
+                    Image(systemName: "chevron.left")
+                        .font(.headline)
+                        .bold()
+                }
+                
                 Spacer()
                 
-                Text("Choose Category")
+                Text("30$")
+                    .font(.headline)
+                    .bold()
+                
+                Spacer()
+            }
+            .padding()
+            
+            // Transaction Description
+            Section {
+                TextField("For", text: $transactionDescription)
+                    .font(.headline)
+                    .padding()
+                    .foregroundStyle(.white)
+                    .background(Color.gray.opacity(0.2))
+                    .cornerRadius(10)
+                    .padding(.horizontal)
+            } header: {
+                Text("Specify Transaction")
                     .font(.title2)
                     .bold()
-                    .padding(.bottom, 20)
-                
-                // Category selection grid
-                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 20) {
+                    .padding(.vertical)
+            }
+            
+            Spacer()
+            
+            // Category Selection
+            Text("Choose Category")
+                .font(.title2)
+                .bold()
+                .padding(.vertical)
+            
+            ScrollView {
+                VStack(spacing: 10) {
                     ForEach(categories, id: \.0) { category in
-                        Button(action: {
-                            selectedCategory = category.0
-                        }) {
-                            VStack {
-                                Image(systemName: category.1)
-                                    .resizable()
-                                    .frame(width: 60, height: 60)
-                                    .padding()
-                                    .background(selectedCategory == category.0 ? category.2 : Color.gray.opacity(0.2))
-                                    .cornerRadius(12)
-                                
-                                Text(category.0)
-                                    .foregroundColor(.black)
+                        CategoryRow(category: category, isSelected: selectedCategory == category.0)
+                            .onTapGesture {
+                                selectedCategory = category.0
                             }
-                        }
+                            .padding(.horizontal)
                     }
                 }
-                .padding(.horizontal)
-                
-                Spacer()
-                
-                // Add Transaction Button
-                Button(action: {
-                    // Handle adding the transaction
-                    onAddTransaction()
-                }) {
-                    Text("Add Transaction")
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(.purple)
-                        .foregroundColor(.white)
-                        .cornerRadius(12)
-                        .padding(.horizontal)
-                }
-                .disabled(selectedCategory == nil)
+            }
+            
+            Spacer()
+            
+            // Add Transaction Button
+            Button(action: {
+                // Handle adding the transaction
+                onAddTransaction()
+            }) {
+                Text("Add Transaction")
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(selectedCategory != nil ? Color.purple : Color.gray)
+                    .foregroundColor(.white)
+                    .cornerRadius(12)
+                    .padding(.horizontal)
+            }
+            .disabled(selectedCategory == nil)
+        }
+        .padding(.vertical)
+    }
+}
+
+// Category Row Component
+struct CategoryRow: View {
+    let category: (String, String, Color)
+    var isSelected: Bool
+    
+    var body: some View {
+        HStack {
+            Image(category.1)
+                .resizable()
+                .scaledToFit()
+                .frame(width: 40, height: 40)
+            
+            Text(category.1)
+                .font(.headline)
+                .foregroundColor(.white)
+            
+            Spacer()
+            
+            if isSelected {
+                Image(systemName: "checkmark.circle.fill")
+                    .foregroundColor(.green)
+                    .imageScale(.large)
+            } else {
+                Image(systemName: "circle")
+                    .foregroundColor(.gray)
+                    .imageScale(.large)
             }
         }
+        .padding()
+        .background(Color.gray.opacity(0.2))
+        .cornerRadius(10)
+    }
 }
+
+// Preview
+struct SelectCategoryView_Previews: PreviewProvider {
+    static var previews: some View {
+        SelectCategoryView(selectedCategory: .constant(nil)) {
+            // Handle Add Transaction
+        }
+    }
+}
+

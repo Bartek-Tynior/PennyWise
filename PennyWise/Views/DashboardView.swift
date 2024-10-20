@@ -12,50 +12,46 @@ struct DashboardView: View {
     @State private var isShowingTransaction = false
 
     @EnvironmentObject var authViewModel: AuthViewModel
-    @State private var isExpanded = false
+    
+    @State private var sampleCategories: [Category] = [
+        Category(name: "Coffee Shops", iconName: "Groceries", budget: 30.00, remaining: 10.00),
+        Category(name: "Gas", iconName: "Rent", budget: 50.00, remaining: 25.00),
+        Category(name: "Going Out", iconName: "Transport", budget: 20.00, remaining: 5.00)
+    ]
 
     var body: some View {
         VStack {
-            HStack {
-                Text("15 Jul - 22 Jul")
-                    .font(.headline)
-                    .foregroundColor(.purple)
-                Image(systemName: "chevron.down")
-            }
-            .onTapGesture {
-                // Animation to expand the date picker
-                withAnimation {
-                    isExpanded.toggle()
-                }
-            }
-                        
-            if isExpanded {
-                // Placeholder for date picker dropdown or expanded date view
-                Text("Date picker placeholder").transition(.move(edge: .top))
-            }
+            TopNavBar()
             
             // Monthly Overview
             HStack {
                 VStack(alignment: .leading) {
                     Text("Monthly")
-                        .font(.headline)
-                    Text("12 days left")
+                        .font(.system(size: 16))
                         .foregroundColor(.gray)
+                    Text("12 days left")
                 }
                 Spacer()
-                VStack {
+                VStack(alignment: .trailing) {
                     Text("Budgeted")
-                        .font(.headline)
+                        .font(.system(size: 16))
+                        .foregroundColor(.gray)
                     Text("$300")
                 }
                 Spacer()
-                VStack {
+                VStack(alignment: .trailing) {
                     Text("Left")
-                        .font(.headline)
+                        .font(.system(size: 16))
+                        .foregroundColor(.gray)
+                                            
                     Text("$279")
                         .foregroundColor(.green)
                 }
             }
+            .padding(.vertical, 8)
+            .padding(.horizontal)
+            .background(.gray.opacity(0.2))
+            .cornerRadius(10)
             .padding()
             
             // List of Categories
@@ -63,20 +59,26 @@ struct DashboardView: View {
                 VStack(spacing: 15) {
                     ForEach(sampleCategories) { category in
                         HStack {
-                            Image(systemName: category.iconName)
+                            Image(category.iconName)
                                 .resizable()
-                                .frame(width: 20)
+                                .scaledToFit()
+                                .frame(width: 34)
                                             
                             Text(category.name)
                                             
                             Spacer()
                                             
-                            Text("$\(category.budget)")
+                            Text("$\(category.budget, specifier: "%.2f")")
                                             
                             Spacer()
                                             
-                            Text("$\(category.remaining)")
-                                .foregroundColor(.green)
+                            RoundedRectangle(cornerRadius: 30)
+                                .fill(Color.green.opacity(0.2))
+                                .frame(width: textWidth(for: String(format: "%.2f", category.remaining)))
+                                .overlay {
+                                    Text("$\(category.remaining, specifier: "%.2f")")
+                                        .foregroundColor(.green)
+                                }
                         }
                         .padding()
                         .background(RoundedRectangle(cornerRadius: 12).stroke(Color.gray.opacity(0.3), lineWidth: 1))
@@ -87,14 +89,17 @@ struct DashboardView: View {
                     }) {
                         Text("Add new category")
                             .foregroundColor(.purple)
+                            .fontWeight(.semibold)
                     }
+                    .frame(maxWidth: .infinity)
                     .padding()
+                    .background(RoundedRectangle(cornerRadius: 12).fill(.gray.opacity(0.1)))
                     .sheet(isPresented: $isShowingCategory) {
                         AddCategoryView()
                     }
                 }
             }
-            .padding()
+            .padding(.horizontal)
         }
         
         // Floating Action Button (FAB)
@@ -106,11 +111,10 @@ struct DashboardView: View {
                 }) {
                     Image(systemName: "plus")
                         .font(.system(size: 24))
-                        .frame(width: 60, height: 60)
-                        .foregroundColor(.white)
-                        .background(Color.purple)
+                        .frame(width: 50, height: 50)
+                        .foregroundColor(.black.opacity(0.9))
+                        .background(Color.white)
                         .clipShape(Circle())
-                        .shadow(color: .gray.opacity(0.4), radius: 4, x: 2, y: 2)
                 }
                 .padding(.trailing, 20)
                 .padding(.bottom, 20)
@@ -120,10 +124,13 @@ struct DashboardView: View {
             }
         }
     }
+    
+    // Function to calculate the width based on text
+    func textWidth(for text: String) -> CGFloat {
+        // Dynamically calculate width based on text content
+        let font = UIFont.systemFont(ofSize: 14)
+        let attributes = [NSAttributedString.Key.font: font]
+        let size = (text as NSString).size(withAttributes: attributes)
+        return size.width + 40
+    }
 }
-
-let sampleCategories = [
-    Category(name: "Groceries", iconName: "cart.fill", budget: 60, remaining: 27),
-    Category(name: "Rent", iconName: "house.fill", budget: 37, remaining: 27),
-    Category(name: "Transport", iconName: "car.fill", budget: 60, remaining: 27)
-]

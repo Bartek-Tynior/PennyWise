@@ -15,21 +15,39 @@ struct SignInView: View {
         VStack {
             Spacer()
             
-            TopNavBar()
-                .padding(.bottom, 40)
+            HStack(spacing: 0) {
+                Text("Penny")
+                    .font(.system(size: 30))
+                    .fontWeight(.semibold)
+                    .foregroundColor(.white)
+
+                Text("Wise.")
+                    .font(.system(size: 30))
+                    .fontWeight(.semibold)
+                    .foregroundColor(.purple)
+            }
+            .padding(.bottom, 40)
             
-            TextField("Email", text: $authViewModel.email)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .padding(.horizontal, 40)
-            SecureField("Password", text: $authViewModel.password)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .padding(.horizontal, 40)
-                .padding(.bottom, 10)
+            TextField("Email", text: $authViewModel.email, prompt: Text("Your email").foregroundStyle(.gray))
+                .font(.headline)
+                .padding()
+                .foregroundStyle(.white)
+                .background(Color.gray.opacity(0.2))
+                .cornerRadius(10)
+                .padding(.horizontal)
+            
+            SecureField("Password", text: $authViewModel.password, prompt: Text("Your password").foregroundStyle(.gray))
+                .font(.headline)
+                .padding()
+                .foregroundStyle(.white)
+                .background(Color.gray.opacity(0.2))
+                .cornerRadius(10)
+                .padding(.horizontal)
             
             Text("Use at least 6 characters including a number and a symbol.")
                 .font(.footnote)
                 .foregroundColor(.gray)
-                .padding(.horizontal, 40)
+                .padding(.vertical, 10)
             
             Spacer()
             
@@ -41,6 +59,7 @@ struct SignInView: View {
                     }
                 }) {
                     Text("Sign In")
+                        .bold()
                         .frame(maxWidth: .infinity)
                         .padding()
                         .background(Color.purple)
@@ -56,6 +75,7 @@ struct SignInView: View {
                         Image(systemName: "applelogo")
                         Text("Sign in with Apple")
                     }
+                    .bold()
                     .frame(maxWidth: .infinity)
                     .padding()
                     .background(Color.black)
@@ -67,6 +87,8 @@ struct SignInView: View {
             
             Spacer()
         }
+        .background(Color.black.opacity(0.9).edgesIgnoringSafeArea(.all))
+        .foregroundColor(.white)
     }
 }
 

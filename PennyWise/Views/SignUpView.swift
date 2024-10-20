@@ -15,8 +15,17 @@ struct SignUpView: View {
         VStack {
             Spacer()
             
-            TopNavBar()
-                .padding(.bottom, 40)
+            HStack(spacing: 0) {
+                Text("Penny")
+                    .font(.system(size: 30))
+                    .fontWeight(.semibold)
+                    .foregroundColor(.white)
+
+                Text("Wise.")
+                    .font(.system(size: 30))
+                    .fontWeight(.semibold)
+                    .foregroundColor(.purple)
+            }
             
             TextField("Name", text: $authViewModel.name)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -46,6 +55,7 @@ struct SignUpView: View {
                     }
                 }) {
                     Text("Sign Up")
+                        .bold()
                         .frame(maxWidth: .infinity)
                         .padding()
                         .background(Color.purple)
@@ -61,6 +71,7 @@ struct SignUpView: View {
                         Image(systemName: "applelogo")
                         Text("Sign up with Apple")
                     }
+                    .bold()
                     .frame(maxWidth: .infinity)
                     .padding()
                     .background(Color.black)
@@ -72,6 +83,8 @@ struct SignUpView: View {
             
             Spacer()
         }
+        .background(Color.black.opacity(0.9).edgesIgnoringSafeArea(.all))
+        .foregroundColor(.white)
     }
 }
 

@@ -8,114 +8,170 @@ import SwiftUI
 
 struct SettingsView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
+    @State private var name: String = "Bart"
+    @State private var currency: String = "EUR"
+    @State private var email: String = "btynior@gmail.com"
+    @State private var reminderActivation: Bool = false
+    @State private var showChangePassword = false
+    @State private var isSubscriptionActive = true
+    @State private var subscriptionExpirationDate = "30 October 2024"
     
     var body: some View {
-        VStack {
+        VStack(alignment: .leading) {
+            Text("Settings")
+                .font(.title)
+                .bold()
+                .padding(.horizontal)
+            
             ScrollView {
-                // User Profile Picture
-                Image(systemName: "person.circle.fill") // Use your actual image asset here
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: 120, height: 120)
-                    .clipShape(Circle())
-                    .padding(.top, 30)
+                Circle()
+                    .fill(Color.purple)
+                    .frame(width: 70, height: 70)
+                    .overlay(
+                        Text("B")
+                            .font(.title)
+                            .foregroundColor(.white)
+                    )
+                    .padding(.vertical, 10)
                 
-                // User Info
-                Text("Chris Newton")
-                    .font(.title2)
-                    .bold()
-                    .padding(.top, 10)
-                
-                // Custom Section Layout Without Gray Background
-                VStack(spacing: 20) {
-                    // Account Section
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("Account")
-                            .font(.headline)
-                            .bold()
-                            .padding(.leading)
-                        
-                        HStack {
-                            Text("Name")
+                VStack(alignment: .leading, spacing: 10) {
+                    Section {
+                        TextField("Name", text: $name)
+                            .fontWeight(.semibold)
+                            .padding()
+                            .foregroundStyle(.white)
+                            .background(.gray.opacity(0.2))
+                            .cornerRadius(10)
+                        TextField("Email", text: $email)
+                            .fontWeight(.semibold)
+                            .padding()
+                            .foregroundStyle(.white)
+                            .background(.gray.opacity(0.2))
+                            .cornerRadius(10)
+                            .keyboardType(.emailAddress)
+                            .autocapitalization(.none)
+
+                        Button {} label: {
+                            Text("Change Password")
+                                .fontWeight(.semibold)
+                                
                             Spacer()
-                            Text("Chris Newton")
-                                .foregroundColor(.gray)
+                                
+                            Image(systemName: "chevron.right")
                         }
                         .padding()
-                        .background(Color.white)
-                        
-                        HStack {
-                            Text("Email")
-                            Spacer()
-                            Text("chris.newton@gmail.com")
-                                .foregroundColor(.gray)
-                        }
-                        .padding()
-                        .background(Color.white)
+                        .foregroundStyle(.white)
+                        .background(.gray.opacity(0.2))
+                        .cornerRadius(10)
+                    } header: {
+                        Text("Account Settings")
+                            .fontWeight(.semibold)
+                            .padding(.top, 10)
                     }
-                    
-                    // App Settings Section
-                    VStack(alignment: .leading, spacing: 10) {
+                        
+                    Section {
+                        TextField("Currency", text: $currency)
+                            .fontWeight(.semibold)
+                            .padding()
+                            .foregroundStyle(.white)
+                            .background(.gray.opacity(0.2))
+                            .cornerRadius(10)
+                            
+                        Toggle("Reminder Notification", isOn: $reminderActivation)
+                            .fontWeight(.semibold)
+                            .padding()
+                            .foregroundStyle(.white)
+                            .background(.gray.opacity(0.2))
+                            .cornerRadius(10)
+                            
+                        Button {} label: {
+                            Text("Homescreen Widgets")
+                                .fontWeight(.semibold)
+                                
+                            Spacer()
+                                
+                            Image(systemName: "chevron.right")
+                        }
+                        .padding()
+                        .foregroundStyle(.white)
+                        .background(.gray.opacity(0.2))
+                        .cornerRadius(10)
+                            
+                    } header: {
                         Text("App Settings")
-                            .font(.headline)
-                            .bold()
-                            .padding(.leading)
-                        
-                        HStack {
-                            Text("Currency")
-                            Spacer()
-                            Text("USD")
-                                .foregroundColor(.gray)
-                        }
-                        .padding()
-                        .background(Color.white)
+                            .fontWeight(.semibold)
+                            .padding(.top, 10)
                     }
                     
-                    // Help & Support Section
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("Help & Support")
-                            .font(.headline)
-                            .bold()
-                            .padding(.leading)
-                        
-                        Button(action: {
-                            // Handle Contact Support
-                        }) {
-                            HStack {
-                                Text("Contact Support")
-                                Spacer()
-                                Image(systemName: "chevron.right")
-                                    .foregroundColor(.gray)
-                            }
+                    Section {
+                        Button {} label: {
+                            Text("📭 Contact Support")
+                                .fontWeight(.semibold)
+                            
+                            Spacer()
+                            
+                            Image(systemName: "chevron.right")
                         }
                         .padding()
-                        .background(Color.white)
+                        .foregroundStyle(.white)
+                        .background(.gray.opacity(0.2))
+                        .cornerRadius(10)
                         
-                        Button(action: {
-                            // Handle Delete Account Action
-                        }) {
-                            Text("Delete Account & Data")
-                                .foregroundColor(.red)
-                                .padding()
-                                .background(Color.white)
+                        Button {} label: {
+                            Text("📖 About the app")
+                                .fontWeight(.semibold)
+                            
+                            Spacer()
+                            
+                            Image(systemName: "chevron.right")
                         }
+                        .padding()
+                        .foregroundStyle(.white)
+                        .background(.gray.opacity(0.2))
+                        .cornerRadius(10)
                         
-                        Button(action: {
-                            // Handle Log Out Action
+                        Button {} label: {
+                            Text("🗑️ Delete account & all your data")
+                                .fontWeight(.semibold)
+                            
+                            Spacer()
+                            
+                            Image(systemName: "chevron.right")
+                        }
+                        .padding()
+                        .foregroundStyle(.red)
+                        .background(.gray.opacity(0.2))
+                        .cornerRadius(10)
+                        
+                        Button {
                             Task {
                                 try await authViewModel.signOut()
                             }
-                        }) {
-                            Text("Log Out")
-                                .foregroundColor(.red)
-                                .padding()
-                                .background(Color.white)
+                        } label: {
+                            Text("👋 Sing Out")
+                                .fontWeight(.semibold)
+                            
+                            Spacer()
+                            
+                            Image(systemName: "chevron.right")
                         }
+                        .padding()
+                        .foregroundStyle(.red)
+                        .background(.gray.opacity(0.2))
+                        .cornerRadius(10)
+                        
+                    } header: {
+                        Text("Help & Support")
+                            .fontWeight(.semibold)
+                            .padding(.top, 10)
                     }
                 }
+                .padding()
             }
-            .padding(.horizontal)
         }
-        .navigationBarTitle("Settings", displayMode: .inline)
-       }
-   }
+    }
+}
+
+#Preview {
+    SettingsView()
+}

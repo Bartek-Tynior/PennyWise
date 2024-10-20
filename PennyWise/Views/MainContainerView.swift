@@ -11,11 +11,7 @@ struct MainContainerView: View {
 
     var body: some View {
         VStack {
-            
-            TopNavBar()
-            
-            Spacer()
-
+                        
             switch selectedTab {
             case .home:
                 DashboardView()
@@ -29,5 +25,7 @@ struct MainContainerView: View {
 
             BottomNav(selectedTab: $selectedTab)
         }
+        .background(Color.black.opacity(0.9).edgesIgnoringSafeArea(.all))
+        .foregroundColor(.white)
     }
 }

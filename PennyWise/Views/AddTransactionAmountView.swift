@@ -32,8 +32,8 @@ struct AddTransactionAmountView: View {
                                     Text(item)
                                         .font(.system(size: 28))
                                         .frame(width: 80, height: 80)
-                                        .foregroundColor(.black)
-                                        .background(Color.gray.opacity(0.1))
+                                        .foregroundColor(.white)
+                                        .background(Color.gray.opacity(0.2))
                                         .cornerRadius(40)
                                 }
                             }

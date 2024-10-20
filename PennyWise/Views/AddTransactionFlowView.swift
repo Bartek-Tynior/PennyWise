@@ -30,6 +30,8 @@ struct AddTransactionFlowView: View {
                 })
             }
         }
+        .background(Color.black.opacity(0.9).edgesIgnoringSafeArea(.all))
+        .foregroundColor(.white)
     }
     
     private func saveTransaction() {
