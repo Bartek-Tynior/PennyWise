@@ -11,14 +11,10 @@ struct DashboardView: View {
     @State private var isShowingCategory = false
     @State private var isShowingTransaction = false
 
+    @StateObject private var categoryViewModel = CategoryViewModel()
+
     @EnvironmentObject var authViewModel: AuthViewModel
     
-    @State private var sampleCategories: [Category] = [
-        Category(name: "Coffee Shops", iconName: "Groceries", budget: 30.00, remaining: 10.00),
-        Category(name: "Gas", iconName: "Rent", budget: 50.00, remaining: 25.00),
-        Category(name: "Going Out", iconName: "Transport", budget: 20.00, remaining: 5.00)
-    ]
-
     var body: some View {
         VStack {
             TopNavBar()
@@ -43,7 +39,7 @@ struct DashboardView: View {
                     Text("Left")
                         .font(.system(size: 16))
                         .foregroundColor(.gray)
-                                            
+                    
                     Text("$279")
                         .foregroundColor(.green)
                 }
@@ -57,21 +53,21 @@ struct DashboardView: View {
             // List of Categories
             ScrollView {
                 VStack(spacing: 15) {
-                    ForEach(sampleCategories) { category in
+                    ForEach(categoryViewModel.categories, id: \.self) { category in // Use \.self if id is optional
                         HStack {
-                            Image(category.iconName)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 34)
-                                            
+                            //                            Image(category.iconName)
+                            //                                .resizable()
+                            //                                .scaledToFit()
+                            //                                .frame(width: 34)
+                            
                             Text(category.name)
-                                            
+                            
                             Spacer()
-                                            
+                            
                             Text("$\(category.budget, specifier: "%.2f")")
-                                            
+                            
                             Spacer()
-                                            
+                            
                             RoundedRectangle(cornerRadius: 30)
                                 .fill(Color.green.opacity(0.2))
                                 .frame(width: textWidth(for: String(format: "%.2f", category.remaining)))
@@ -100,6 +96,9 @@ struct DashboardView: View {
                 }
             }
             .padding(.horizontal)
+            .task {
+                try? await categoryViewModel.fetchCategories() // Use the instance, not the type
+            }
         }
         
         // Floating Action Button (FAB)
