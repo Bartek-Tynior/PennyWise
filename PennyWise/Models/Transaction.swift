@@ -7,9 +7,18 @@
 
 import Foundation
 
-struct Transaction: Identifiable {
-    let id = UUID()
-    let name: String
-    let category: String
-    let amount: Double
+struct Transaction: Identifiable, Codable, Hashable {
+    var id: Int?
+    var amount: Double
+    var description: String
+    var createdAt: Date
+    var userId: UUID
+    var categoryId: UUID
+    
+    enum CodingKeys: String, CodingKey {
+        case id, amount, description
+        case createdAt = "created_at"
+        case userId = "user_id"
+        case categoryId = "category_id"
+    }
 }

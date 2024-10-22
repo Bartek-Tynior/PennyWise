@@ -9,6 +9,8 @@ import SwiftUI
 struct TransactionsView: View {
     @State private var selectedTab: String = "All Month"
     @State private var isShowingTransaction = false
+    
+    @StateObject private var transactionsViewModel = TransactionsViewModel()
         
     var body: some View {
         VStack(alignment: .leading) {
@@ -48,14 +50,9 @@ struct TransactionsView: View {
             // Transactions List
             ScrollView {
                 VStack(spacing: 15) {
-                    ForEach(sampleTransactions) { transaction in
+                    ForEach(transactionsViewModel.transactions) { transaction in
                         HStack {
-                            Image("Groceries")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 34)
-                                            
-                            Text(transaction.name)
+                            Text(transaction.description)
                                             
                             Spacer()
                                             
@@ -67,6 +64,14 @@ struct TransactionsView: View {
                 }
             }
             .padding(.horizontal)
+            .task {
+                do {
+                    try await transactionsViewModel.fetchTransactions()
+                } catch {
+                    // Handle error here, if necessary
+                    print("Error fetching transactions: \(error)")
+                }
+            }
                 
             // Floating Action Button (FAB)
             ZStack {
@@ -91,14 +96,4 @@ struct TransactionsView: View {
             }
         }
     }
-}
-
-let sampleTransactions = [
-    Transaction(name: "coffee", category: "cafe", amount: 3.50),
-    Transaction(name: "bread", category: "Groceries", amount: 7.34)
-
-]
-
-#Preview {
-    TransactionsView()
 }
