@@ -24,4 +24,39 @@ final class CategoryViewModel: ObservableObject {
             self.categories = categories
         }
     }
+    
+    func addCategory(_ category: Category) async throws {
+        try await supabaseService.getClient()
+            .from("categories")
+            .insert(category)
+            .execute()
+    }
+    
+    func updateCategory(_ category: Category) async throws {
+        
+        guard let id = category.id else {
+            print ("Error: Can't update category \(String(describing: category.id))")
+            return
+        }
+        
+        var toUpdate = category
+        
+        do {
+            try await supabaseService.getClient()
+                .from("categories")
+                .update(toUpdate)
+                .eq("id", value: id)
+                .execute()
+        } catch {
+            print("Error: \(error)")
+        }
+    }
+    
+    func deleteCategory(at id: String) async throws {
+        try await supabaseService.getClient()
+            .from("categories")
+            .delete()
+            .eq("id", value: id)
+            .execute()
+    }
 }

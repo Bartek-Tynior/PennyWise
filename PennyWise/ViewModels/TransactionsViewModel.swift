@@ -24,4 +24,11 @@ final class TransactionsViewModel: ObservableObject {
             self.transactions = transactions
         }
     }
+    
+    func addTransaction(_ transaction: Transaction) async throws {
+        try await supabaseService.getClient()
+            .from("transactions")
+            .insert(transaction)
+            .execute()
+    }
 }

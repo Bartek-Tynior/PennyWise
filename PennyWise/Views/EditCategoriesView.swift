@@ -13,19 +13,16 @@ struct EditCategoriesView: View {
     @State private var categoryName: String = ""
     @State var selectedTimeType: TimeTypes?
     
+    @StateObject private var categoryViewModel = CategoryViewModel()
+    
     enum TimeTypes: String, CaseIterable, Identifiable {
         case monthly, weekly
         var id: String { self.rawValue }
     }
     
-    let categories = [
-        ("Groceries", "Groceries", 45.78),
-        ("Rent", "Rent", 90.73),
-        ("Transport", "Transport", 93.21)
-    ]
     
     // Extract the button for each item into a separate view
-    func categoryItem(category: (String, String, Double)) -> some View {
+    func categoryItem(category: Category) -> some View {
         VStack(alignment: .leading, spacing: 20) {
             HStack(spacing: 20) {
                 Circle()
@@ -37,7 +34,7 @@ struct EditCategoriesView: View {
                             .foregroundColor(.white)
                     )
                 
-                TextField("Category name", text: $categoryName, prompt: Text("Your email").foregroundStyle(.white))
+                TextField("Category name", text: $categoryName, prompt: Text(category.name).foregroundStyle(.white))
                     .font(.headline)
                     .padding()
                     .foregroundStyle(.white)
@@ -46,7 +43,7 @@ struct EditCategoriesView: View {
             }
             
             HStack(spacing: 0) {
-                TextField("Category name", text: $categoryName, prompt: Text("Your email").foregroundStyle(.white))
+                TextField("Allocated Amount", text: $categoryName, prompt: Text(String(category.allocatedAmount)).foregroundStyle(.white))
                     .font(.headline)
                     .padding()
                     .foregroundStyle(.white)
@@ -100,11 +97,19 @@ struct EditCategoriesView: View {
             .padding()
             
             ScrollView {
-                ForEach(categories, id: \.0) { category in
+                ForEach(categoryViewModel.categories) { category in // Ensure we're using the instance variable
                     categoryItem(category: category)
                 }
             }
             .padding()
+            .task {
+                do {
+                    try await categoryViewModel.fetchCategories()
+                } catch {
+                    // Handle error here, if necessary
+                    print("Error fetching categories: \(error)")
+                }
+            }
         }
         .background(Color.black.opacity(0.9).edgesIgnoringSafeArea(.all))
         .foregroundColor(.white)

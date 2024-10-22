@@ -9,6 +9,8 @@ import SwiftUI
 
 struct AddTransactionFlowView: View {
     @Environment(\.presentationMode) var presentationMode
+    
+    @StateObject private var transactionsViewModel = TransactionsViewModel()
 
     @State private var step: TransactionStep = .enterAmount
     @State private var amount = ""
@@ -35,8 +37,11 @@ struct AddTransactionFlowView: View {
     }
     
     private func saveTransaction() {
-        // Add the logic to save the transaction with the amount and selected category
-        print("Transaction saved with amount: \(amount) and category: \(selectedCategory ?? "None")")
+//        let newTransaction
+//        
+//        do {
+//            transactionsViewModel.addTransaction()
+//        }
     }
 }
 
