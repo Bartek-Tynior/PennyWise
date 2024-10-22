@@ -53,26 +53,21 @@ struct DashboardView: View {
             // List of Categories
             ScrollView {
                 VStack(spacing: 15) {
-                    ForEach(categoryViewModel.categories, id: \.self) { category in // Use \.self if id is optional
+                    ForEach(categoryViewModel.categories) { category in // Ensure we're using the instance variable
                         HStack {
-                            //                            Image(category.iconName)
-                            //                                .resizable()
-                            //                                .scaledToFit()
-                            //                                .frame(width: 34)
-                            
                             Text(category.name)
                             
                             Spacer()
                             
-                            Text("$\(category.budget, specifier: "%.2f")")
+                            Text("$\(category.allocatedAmount, specifier: "%.2f")") // Fixed property name to match your model
                             
                             Spacer()
                             
                             RoundedRectangle(cornerRadius: 30)
                                 .fill(Color.green.opacity(0.2))
-                                .frame(width: textWidth(for: String(format: "%.2f", category.remaining)))
+                                .frame(width: textWidth(for: String(format: "%.2f", category.allocatedAmount))) // Ensure you use the correct property
                                 .overlay {
-                                    Text("$\(category.remaining, specifier: "%.2f")")
+                                    Text("$\(category.allocatedAmount, specifier: "%.2f")") // Same here
                                         .foregroundColor(.green)
                                 }
                         }
@@ -97,7 +92,12 @@ struct DashboardView: View {
             }
             .padding(.horizontal)
             .task {
-                try? await categoryViewModel.fetchCategories() // Use the instance, not the type
+                do {
+                    try await categoryViewModel.fetchCategories()
+                } catch {
+                    // Handle error here, if necessary
+                    print("Error fetching categories: \(error)")
+                }
             }
         }
         

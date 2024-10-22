@@ -8,7 +8,7 @@
 import Foundation
 
 struct Category: Identifiable, Codable, Hashable {
-    var id: Int?
+    var id: UUID?
     var name: String
     var allocatedAmount: Double
     var periodicity: String
@@ -17,7 +17,7 @@ struct Category: Identifiable, Codable, Hashable {
     
     enum CodingKeys: String, CodingKey {
         case id, name, periodicity
-        case allocatedAmount = "allocted_amount"
+        case allocatedAmount = "allocated_amount"
         case createdAt = "created_at"
         case userId = "user_id"
     }
