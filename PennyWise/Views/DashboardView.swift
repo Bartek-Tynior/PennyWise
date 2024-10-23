@@ -9,13 +9,11 @@ import SwiftUI
 struct DashboardView: View {
     @State private var isShowingCategory = false
     @State private var isShowingTransaction = false
-    
-    @StateObject private var categoryViewModel = CategoryViewModel()
-    @StateObject private var transactionViewModel = TransactionsViewModel()
+
+    @EnvironmentObject var appDataViewModel: AppDataViewModel
+    @EnvironmentObject var authViewModel: AuthViewModel
     @StateObject private var dashboardViewModel = DashboardViewModel()
 
-    @EnvironmentObject var authViewModel: AuthViewModel
-    
     var body: some View {
         VStack {
             TopNavBar()
@@ -40,7 +38,6 @@ struct DashboardView: View {
                     Text("Left")
                         .font(.system(size: 16))
                         .foregroundColor(.gray)
-                    
                     Text("$\(dashboardViewModel.totalLeft, specifier: "%.2f")")
                         .foregroundColor(dashboardViewModel.totalLeft >= 0 ? .green : .red)
                 }
@@ -50,32 +47,20 @@ struct DashboardView: View {
             .background(.gray.opacity(0.2))
             .cornerRadius(10)
             .padding()
-            
+
             // List of Categories
             ScrollView {
                 VStack(spacing: 15) {
-                    ForEach(categoryViewModel.categories) { category in
+                    ForEach(appDataViewModel.categories) { category in
                         HStack {
                             Text(category.name)
-                            
                             Spacer()
-                            
                             Text("$\(category.allocatedAmount, specifier: "%.2f")")
-                            
-                            Spacer()
-                            
-                            RoundedRectangle(cornerRadius: 30)
-                                .fill(Color.green.opacity(0.2))
-                                .frame(width: textWidth(for: String(format: "%.2f", category.allocatedAmount)))
-                                .overlay {
-                                    Text("$\(category.allocatedAmount, specifier: "%.2f")")
-                                        .foregroundColor(.green)
-                                }
                         }
                         .padding()
                         .background(RoundedRectangle(cornerRadius: 12).stroke(Color.gray.opacity(0.3), lineWidth: 1))
                     }
-                    
+
                     Button(action: {
                         isShowingCategory.toggle()
                     }) {
@@ -93,14 +78,14 @@ struct DashboardView: View {
             }
             .padding(.horizontal)
             .onAppear {
-                if categoryViewModel.categories.isEmpty || transactionViewModel.transactions.isEmpty {
+                if appDataViewModel.categories.isEmpty || appDataViewModel.transactions.isEmpty {
                     Task {
-                        await loadData()
+                        try? await appDataViewModel.fetchAllData()
                     }
                 }
             }
         }
-        
+
         // Floating Action Button (FAB)
         ZStack {
             HStack {
@@ -126,22 +111,16 @@ struct DashboardView: View {
     
     // Function to load data and update the dashboard view model
     func loadData() async {
-        do {
-            // Fetch categories and transactions
-            try await categoryViewModel.fetchCategories()
-            try await transactionViewModel.fetchTransactions()
-            
-            // Update the dashboard view model with fetched data
-            dashboardViewModel.calculateBudget(
-                categories: categoryViewModel.categories,
-                transactions: transactionViewModel.transactions
-            )
-            
-            dashboardViewModel.calculateDaysLeftInMonth()
-        } catch {
-            print("Error fetching data: \(error)")
+            do {
+                // Fetch categories and transactions via the global AppDataViewModel
+                try await appDataViewModel.fetchAllData()
+
+                // Optionally, perform additional calculations for the dashboard (e.g., total budgeted)
+                dashboardViewModel.calculateBudget(categories: appDataViewModel.categories, transactions: appDataViewModel.transactions)
+            } catch {
+                print("Error fetching data: \(error)")
+            }
         }
-    }
 
     // Function to calculate the width based on text
     func textWidth(for text: String) -> CGFloat {

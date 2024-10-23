@@ -10,7 +10,7 @@ import SwiftUI
 struct AddTransactionFlowView: View {
     @Environment(\.presentationMode) var presentationMode
     
-    @StateObject private var transactionsViewModel = TransactionsViewModel()
+    @StateObject private var appDataViewModel = AppDataViewModel()
 
     @State private var step: TransactionStep = .enterAmount
     @State private var amount = ""

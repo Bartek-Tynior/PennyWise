@@ -11,11 +11,13 @@ import SwiftUI
 struct PennyWiseApp: App {
     
     @StateObject var authViewModel = AuthViewModel()
+    @StateObject private var appDataViewModel = AppDataViewModel()
 
         var body: some Scene {
             WindowGroup {
                 ContentView()
                     .environmentObject(authViewModel)
+                    .environmentObject(appDataViewModel)
                     .onAppear {
                         Task {
                             await authViewModel.checkSession()

@@ -10,7 +10,7 @@ struct TransactionsView: View {
     @State private var selectedTab: String = "All Month"
     @State private var isShowingTransaction = false
     
-    @StateObject private var transactionsViewModel = TransactionsViewModel()
+    @StateObject private var appDataViewModel = AppDataViewModel()
         
     var body: some View {
         VStack(alignment: .leading) {
@@ -50,7 +50,7 @@ struct TransactionsView: View {
             // Transactions List
             ScrollView {
                 VStack(spacing: 15) {
-                    ForEach(transactionsViewModel.transactions) { transaction in
+                    ForEach(appDataViewModel.transactions) { transaction in
                         HStack {
                             Text(transaction.description)
                                             
@@ -66,7 +66,7 @@ struct TransactionsView: View {
             .padding(.horizontal)
             .task {
                 do {
-                    try await transactionsViewModel.fetchTransactions()
+                    try await appDataViewModel.fetchAllData()
                 } catch {
                     // Handle error here, if necessary
                     print("Error fetching transactions: \(error)")

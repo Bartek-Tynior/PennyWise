@@ -13,7 +13,7 @@ struct EditCategoriesView: View {
     @State private var categoryName: String = ""
     @State var selectedTimeType: TimeTypes?
     
-    @StateObject private var categoryViewModel = CategoryViewModel()
+    @StateObject private var appDataViewModel = AppDataViewModel()
     
     enum TimeTypes: String, CaseIterable, Identifiable {
         case monthly, weekly
@@ -97,14 +97,14 @@ struct EditCategoriesView: View {
             .padding()
             
             ScrollView {
-                ForEach(categoryViewModel.categories) { category in // Ensure we're using the instance variable
+                ForEach(appDataViewModel.categories) { category in // Ensure we're using the instance variable
                     categoryItem(category: category)
                 }
             }
             .padding()
             .task {
                 do {
-                    try await categoryViewModel.fetchCategories()
+                    try await appDataViewModel.fetchAllData()
                 } catch {
                     // Handle error here, if necessary
                     print("Error fetching categories: \(error)")
