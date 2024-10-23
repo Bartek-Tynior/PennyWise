@@ -78,10 +78,14 @@ struct DashboardView: View {
             }
             .padding(.horizontal)
             .onAppear {
+                dashboardViewModel.calculateDaysLeftInMonth()
                 if appDataViewModel.categories.isEmpty || appDataViewModel.transactions.isEmpty {
                     Task {
-                        try? await appDataViewModel.fetchAllData()
+                        await loadData()  // Ensure loadData is called
                     }
+                } else {
+                    // Call this if data is already loaded, otherwise it will happen after load
+                    dashboardViewModel.calculateBudget(categories: appDataViewModel.categories, transactions: appDataViewModel.transactions)
                 }
             }
         }
@@ -109,18 +113,17 @@ struct DashboardView: View {
         }
     }
     
-    // Function to load data and update the dashboard view model
     func loadData() async {
-            do {
-                // Fetch categories and transactions via the global AppDataViewModel
-                try await appDataViewModel.fetchAllData()
+        do {
+            // Fetch categories and transactions via the global AppDataViewModel
+            try await appDataViewModel.fetchAllData()
 
-                // Optionally, perform additional calculations for the dashboard (e.g., total budgeted)
-                dashboardViewModel.calculateBudget(categories: appDataViewModel.categories, transactions: appDataViewModel.transactions)
-            } catch {
-                print("Error fetching data: \(error)")
-            }
+            // Recalculate budget after data is fetched
+            dashboardViewModel.calculateBudget(categories: appDataViewModel.categories, transactions: appDataViewModel.transactions)
+        } catch {
+            print("Error fetching data: \(error)")
         }
+    }
 
     // Function to calculate the width based on text
     func textWidth(for text: String) -> CGFloat {

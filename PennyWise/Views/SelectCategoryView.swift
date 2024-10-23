@@ -9,8 +9,7 @@ import SwiftUI
 
 struct SelectCategoryView: View {
     @Binding var selectedCategory: String?
-    @State private var transactionDescription: String = ""
-    @State private var currency: String = "EUR"
+    @Binding var transactionDescription: String // Added description binding
     var onAddTransaction: () -> Void
     
     let categories = [
@@ -24,7 +23,7 @@ struct SelectCategoryView: View {
             
             HStack {
                 Button {
-                    
+                    // Optionally handle back navigation
                 } label: {
                     Image(systemName: "chevron.left")
                         .font(.headline)
@@ -33,7 +32,7 @@ struct SelectCategoryView: View {
                 
                 Spacer()
                 
-                Text("30$")
+                Text("$\(selectedCategory ?? "0.00")") // Ensure you display the right value here
                     .font(.headline)
                     .bold()
                 
@@ -129,15 +128,6 @@ struct CategoryRow: View {
         .padding()
         .background(Color.gray.opacity(0.2))
         .cornerRadius(10)
-    }
-}
-
-// Preview
-struct SelectCategoryView_Previews: PreviewProvider {
-    static var previews: some View {
-        SelectCategoryView(selectedCategory: .constant(nil)) {
-            // Handle Add Transaction
-        }
     }
 }
 
