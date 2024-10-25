@@ -4,11 +4,14 @@
 //
 //  Created by Bart Tynior on 09/10/2024.
 //
+
 import SwiftUI
 
 struct DashboardView: View {
     @State private var isShowingCategory = false
     @State private var isShowingTransaction = false
+
+    let cornerRadius: CGFloat = 12
 
     @EnvironmentObject var appDataViewModel: AppDataViewModel
     @EnvironmentObject var authViewModel: AuthViewModel
@@ -52,10 +55,20 @@ struct DashboardView: View {
             ScrollView {
                 VStack(spacing: 15) {
                     ForEach(appDataViewModel.categories) { category in
+                        let remainingBalance = dashboardViewModel.categoryBalances[category.id!] ?? category.allocatedAmount
+
                         HStack {
                             Text(category.name)
                             Spacer()
                             Text("$\(category.allocatedAmount, specifier: "%.2f")")
+                            Spacer()
+                            Text("$\(remainingBalance, specifier: "%.2f")")
+                                .foregroundColor(remainingBalance >= 0 ? .green : .red)
+                                .background(
+                                    RoundedRectangle(cornerRadius: cornerRadius)
+                                        .fill(remainingBalance >= 0 ? .green.opacity(0.2) : .red.opacity(0.2))
+                                        .frame(width: textWidth(for: String(remainingBalance)))
+                                )
                         }
                         .padding()
                         .background(RoundedRectangle(cornerRadius: 12).stroke(Color.gray.opacity(0.3), lineWidth: 1))
@@ -81,7 +94,7 @@ struct DashboardView: View {
                 dashboardViewModel.calculateDaysLeftInMonth()
                 if appDataViewModel.categories.isEmpty || appDataViewModel.transactions.isEmpty {
                     Task {
-                        await loadData()  // Ensure loadData is called
+                        await loadData() // Ensure loadData is called
                     }
                 } else {
                     // Call this if data is already loaded, otherwise it will happen after load
@@ -112,7 +125,7 @@ struct DashboardView: View {
             }
         }
     }
-    
+
     func loadData() async {
         do {
             // Fetch categories and transactions via the global AppDataViewModel
@@ -133,4 +146,3 @@ struct DashboardView: View {
         return size.width + 40
     }
 }
-

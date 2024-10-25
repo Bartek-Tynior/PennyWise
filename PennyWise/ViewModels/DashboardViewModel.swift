@@ -12,11 +12,26 @@ class DashboardViewModel: ObservableObject {
     @Published var totalBudgeted: Double = 0.0
     @Published var totalLeft: Double = 0.0
     @Published var daysLeftInMonth: Int = 0
+    @Published var categoryBalances: [UUID: Double] = [:]
 
+    func calculateCategoryBalances(categories: [Category], transactions: [Transaction]) {
+        var balances = [UUID: Double]()
+        
+        for category in categories {
+            let categoryTransactions = transactions.filter { $0.categoryId == category.id }
+            let totalSpent = categoryTransactions.reduce(0.0) { $0 + $1.amount }
+            let remainingBalance = category.allocatedAmount - totalSpent
+            balances[category.id!] = remainingBalance
+        }
+        
+        self.categoryBalances = balances
+    }
+    
     func calculateBudget(categories: [Category], transactions: [Transaction]) {
         let (budgeted, left) = calculateTotalBudgetedAndLeft(categories: categories, transactions: transactions)
         self.totalBudgeted = budgeted
         self.totalLeft = left
+        calculateCategoryBalances(categories: categories, transactions: transactions) // Call this to update balances
     }
 
     func calculateDaysLeftInMonth() {
@@ -34,12 +49,13 @@ class DashboardViewModel: ObservableObject {
         var totalSpent = 0.0
 
         for category in categories {
-            if category.periodicity == "Monthly" {
+            if category.periodicity.caseInsensitiveCompare("Monthly") == .orderedSame {
                 totalBudgeted += category.allocatedAmount
                 let categoryTransactions = transactions.filter { $0.categoryId == category.id }
                 totalSpent += categoryTransactions.reduce(0.0) { $0 + $1.amount }
             }
         }
+
 
         let totalLeft = totalBudgeted - totalSpent
         return (totalBudgeted, totalLeft)
