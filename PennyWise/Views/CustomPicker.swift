@@ -7,10 +7,6 @@
 
 import SwiftUI
 
-enum TimeTypes: String, CaseIterable, Identifiable {
-    case monthly, weekly
-    var id: String { self.rawValue }
-}
 
 struct CustomPicker<SelectionValue, Content>: View where SelectionValue == Content.Element, Content: RandomAccessCollection, Content.Element: Identifiable & Equatable, Content.Element.ID == String {
 
@@ -113,7 +109,7 @@ struct CustomPicker<SelectionValue, Content>: View where SelectionValue == Conte
 #Preview {
     VStack {
         CustomPicker(selection: .constant(nil)) {
-            TimeTypes.allCases
+            Periodicity.allCases
         }
     }
     .preferredColorScheme(.dark)

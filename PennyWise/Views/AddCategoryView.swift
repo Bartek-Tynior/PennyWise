@@ -10,17 +10,16 @@ import SwiftUI
 struct AddCategoryView: View {
     @State private var categoryName: String = ""
     @State private var allocatedAmount: String = ""
+    let supabaseService = SupabaseService.shared
+    @EnvironmentObject var appDataViewModel: AppDataViewModel
+
     
-    @State var selectedTimeType: TimeTypes?
+    @State var selectedPeriodicity: Periodicity?
     
     // State variables for handling ActionSheet and Delete Confirmation
     @State private var showActionSheet = false
     @State private var showDeleteConfirmation = false
     
-    enum TimeTypes: String, CaseIterable, Identifiable {
-        case monthly, weekly
-        var id: String { self.rawValue }
-    }
     
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -75,8 +74,8 @@ struct AddCategoryView: View {
                             .cornerRadius(10)
                         
                         VStack {
-                            CustomPicker(selection: self.$selectedTimeType) {
-                                TimeTypes.allCases
+                            CustomPicker(selection: self.$selectedPeriodicity) {
+                                Periodicity.allCases
                             }
                         }
                     }
@@ -85,9 +84,10 @@ struct AddCategoryView: View {
                 
                 Spacer()
                 
-                // Save Changes Button
                 Button(action: {
-                    // Add save functionality
+                    Task {
+                        saveCategory()
+                    }
                 }) {
                     Text("Create a category")
                         .font(.headline)
@@ -103,6 +103,29 @@ struct AddCategoryView: View {
         }
         .background(Color.black.opacity(0.9).edgesIgnoringSafeArea(.all))
         .foregroundColor(.white)
+    }
+    
+    func saveCategory() {
+        
+        guard let userId = SupabaseService.shared.getClient().auth.currentUser?.id else {
+            print("Invalid input for transaction or user not logged in")
+            return
+        }
+        
+        
+        let category = Category(
+            id: UUID(),
+            name: categoryName,
+            allocatedAmount: Double(allocatedAmount)!,
+            periodicity: selectedPeriodicity!.rawValue,
+            createdAt: Date(),
+            userId: userId
+        )
+        
+    Task {
+        try? await appDataViewModel.addCategory(category)
+    }
+        
     }
 }
 
