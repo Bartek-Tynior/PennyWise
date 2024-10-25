@@ -8,15 +8,11 @@
 import SwiftUI
 
 struct SelectCategoryView: View {
-    @Binding var selectedCategory: String?
+    @Binding var selectedCategoryId: String?
     @Binding var transactionDescription: String // Added description binding
     var onAddTransaction: () -> Void
     
-    let categories = [
-        ("Groceries", "Groceries", Color.purple),
-        ("Rent", "Rent", Color.green),
-        ("Transport", "Transport", Color.blue)
-    ]
+    @EnvironmentObject var appDataViewModel: AppDataViewModel // Access categories from view model
     
     var body: some View {
         VStack {
@@ -32,7 +28,7 @@ struct SelectCategoryView: View {
                 
                 Spacer()
                 
-                Text("$\(selectedCategory ?? "0.00")") // Ensure you display the right value here
+                Text("$\(selectedCategoryId ?? "0.00")") // Ensure you display the right value here
                     .font(.headline)
                     .bold()
                 
@@ -64,12 +60,13 @@ struct SelectCategoryView: View {
                 .bold()
                 .padding(.vertical)
             
+            // Use categories from the view model
             ScrollView {
                 VStack(spacing: 10) {
-                    ForEach(categories, id: \.0) { category in
-                        CategoryRow(category: category, isSelected: selectedCategory == category.0)
+                    ForEach(appDataViewModel.categories, id: \.id) { category in
+                        CategoryRow(category: category, isSelected: selectedCategoryId == category.id?.uuidString)
                             .onTapGesture {
-                                selectedCategory = category.0
+                                selectedCategoryId = category.id?.uuidString
                             }
                             .padding(.horizontal)
                     }
@@ -86,30 +83,29 @@ struct SelectCategoryView: View {
                 Text("Add Transaction")
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(selectedCategory != nil ? Color.purple : Color.gray)
+                    .background(selectedCategoryId != nil ? Color.purple : Color.gray)
                     .foregroundColor(.white)
                     .cornerRadius(12)
                     .padding(.horizontal)
             }
-            .disabled(selectedCategory == nil)
+            .disabled(selectedCategoryId == nil)
         }
         .padding(.vertical)
     }
 }
 
-// Category Row Component
 struct CategoryRow: View {
-    let category: (String, String, Color)
+    let category: Category // Accept Category model
     var isSelected: Bool
     
     var body: some View {
         HStack {
-            Image(category.1)
+            Image(systemName: "folder") // Placeholder; replace with category icon if available
                 .resizable()
                 .scaledToFit()
                 .frame(width: 40, height: 40)
             
-            Text(category.1)
+            Text(category.name ?? "Unknown") // Display category name
                 .font(.headline)
                 .foregroundColor(.white)
             

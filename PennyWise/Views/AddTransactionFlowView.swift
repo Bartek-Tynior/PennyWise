@@ -9,13 +9,12 @@ import SwiftUI
 
 struct AddTransactionFlowView: View {
     @Environment(\.presentationMode) var presentationMode
-    
-    @EnvironmentObject var appDataViewModel: AppDataViewModel // Use shared view model
+    @EnvironmentObject var appDataViewModel: AppDataViewModel
 
     @State private var step: TransactionStep = .enterAmount
     @State private var amount = ""
-    @State private var selectedCategory: String? = nil
-    @State private var transactionDescription: String = "" // To pass to SelectCategoryView
+    @State private var selectedCategoryId: String? = nil
+    @State private var transactionDescription: String = ""
     
     var body: some View {
         VStack {
@@ -27,8 +26,8 @@ struct AddTransactionFlowView: View {
             } else if step == .selectCategory {
                 // Category selection step
                 SelectCategoryView(
-                    selectedCategory: $selectedCategory,
-                    transactionDescription: $transactionDescription, // Bind description
+                    selectedCategoryId: $selectedCategoryId,
+                    transactionDescription: $transactionDescription,
                     onAddTransaction: {
                         saveTransaction()
                         presentationMode.wrappedValue.dismiss()
@@ -37,29 +36,38 @@ struct AddTransactionFlowView: View {
         }
         .background(Color.black.opacity(0.9).edgesIgnoringSafeArea(.all))
         .foregroundColor(.white)
+        .onAppear {
+            Task {
+                // Fetch categories and transactions when the view appears
+                try? await appDataViewModel.fetchAllData()
+            }
+        }
     }
     
     private func saveTransaction() {
-        // Ensure the input data is valid before proceeding
-        guard let selectedCategory = selectedCategory, !amount.isEmpty, let amountDouble = Double(amount) else {
-            return // Show error or alert
+        guard let selectedCategoryId = selectedCategoryId,
+              let userId = SupabaseService.shared.getClient().auth.currentUser?.id,
+              !amount.isEmpty,
+              let amountDouble = Double(amount) else {
+            print("Invalid input for transaction or user not logged in")
+            return
         }
-        
-        let transation = Transaction(
-            id: 2,
+
+        let transaction = Transaction(
+            id: nil,
             amount: amountDouble,
             description: transactionDescription,
-            createdAt: ,
-            userId: ,
-            categoryId: selectedCategory)
+            createdAt: Date(),
+            userId: userId,
+            categoryId: UUID(uuidString: selectedCategoryId)!
         )
         
-        // Use appDataViewModel to add the transaction
         Task {
             try? await appDataViewModel.addTransaction(transaction)
         }
     }
 }
+
 
 enum TransactionStep {
     case enterAmount

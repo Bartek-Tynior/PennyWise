@@ -14,21 +14,16 @@ struct AddTransactionAmountView: View {
     var body: some View {
         VStack {
             Spacer()
-            
-            // Displaying entered amount
             Text("$\(amount.isEmpty ? "0.00" : amount)")
                 .font(.system(size: 50))
                 .foregroundColor(.purple)
                 .padding(.bottom, 40)
             
-            // Custom number pad
             VStack(spacing: 10) {
                 ForEach([["1", "2", "3"], ["4", "5", "6"], ["7", "8", "9"], [".", "0", "⌫"]], id: \.self) { row in
                     HStack {
                         ForEach(row, id: \.self) { item in
-                            Button(action: {
-                                handleButtonPress(item)
-                            }) {
+                            Button(action: { handleButtonPress(item) }) {
                                 Text(item)
                                     .font(.system(size: 28))
                                     .frame(width: 80, height: 80)
@@ -43,11 +38,7 @@ struct AddTransactionAmountView: View {
             
             Spacer()
             
-            // Continue Button
-            Button(action: {
-                // Move to the next step
-                onContinue()
-            }) {
+            Button(action: onContinue) {
                 Text("Continue")
                     .frame(maxWidth: .infinity)
                     .padding()
