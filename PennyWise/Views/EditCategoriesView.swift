@@ -9,8 +9,8 @@ import SwiftUI
 
 struct EditCategoriesView: View {
     @Environment(\.presentationMode) var presentationMode
-    @StateObject private var appDataViewModel = AppDataViewModel()
-    
+    @EnvironmentObject var appDataViewModel: AppDataViewModel // Access the shared AppDataViewModel
+
     // Track edits in a temporary array
     @State private var editedCategories: [Category] = []
     @State private var isLoading = false
@@ -31,9 +31,7 @@ struct EditCategoriesView: View {
             }
             .padding()
             .task {
-                Task {
-                    await loadCategories() // Ensure loadData is called
-                }
+                await loadCategories()
             }
             .alert("Error", isPresented: .constant(errorMessage != nil), presenting: errorMessage) { _ in
                 Button("OK", role: .cancel) { errorMessage = nil }
@@ -51,7 +49,7 @@ struct EditCategoriesView: View {
                 .font(.title)
                 .bold()
             Spacer()
-            Button("Edit") {
+            Button("Save") {
                 Task { await commitChanges() }
             }
             .foregroundStyle(.purple)
@@ -63,28 +61,29 @@ struct EditCategoriesView: View {
     }
     
     private func loadCategories() async {
-            isLoading = true
-            do {
-                try await appDataViewModel.fetchAllData()
-                editedCategories = appDataViewModel.categories // Copy categories for editing
-            } catch {
-                errorMessage = "Error fetching categories: \(error.localizedDescription)"
-            }
-            isLoading = false
+        isLoading = true
+        do {
+            try await appDataViewModel.fetchAllData() // Load categories into the shared appDataViewModel
+            editedCategories = appDataViewModel.categories // Copy categories for editing
+        } catch {
+            errorMessage = "Error fetching categories: \(error.localizedDescription)"
         }
+        isLoading = false
+    }
         
-        private func commitChanges() async {
-            isLoading = true
-            do {
-                try await appDataViewModel.updateCategories(editedCategories) // Update categories in bulk
+    private func commitChanges() async {
+        isLoading = true
+        do {
+            try await appDataViewModel.updateCategories(editedCategories) // Update categories in bulk
+            try await appDataViewModel.fetchAllData()
                 
-                // Dismiss EditCategoriesView
-                presentationMode.wrappedValue.dismiss()
-            } catch {
-                errorMessage = "Error updating categories: \(error.localizedDescription)"
-            }
-            isLoading = false
+            // Dismiss EditCategoriesView
+            presentationMode.wrappedValue.dismiss()
+        } catch {
+            errorMessage = "Error updating categories: \(error.localizedDescription)"
         }
+        isLoading = false
+    }
 }
 
 #Preview {

@@ -62,6 +62,7 @@ final class AppDataViewModel: ObservableObject {
                try await updateCategory(category)
            }
            
+           // Refresh categories after adding a new one
            try await fetchAllData()
        }
        
