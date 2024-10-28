@@ -9,111 +9,82 @@ import SwiftUI
 
 struct EditCategoriesView: View {
     @Environment(\.presentationMode) var presentationMode
-    
-    @State private var categoryName: String = ""
-    @State var selectedTimeType: TimeTypes?
-    
     @StateObject private var appDataViewModel = AppDataViewModel()
     
-    enum TimeTypes: String, CaseIterable, Identifiable {
-        case monthly, weekly
-        var id: String { self.rawValue }
-    }
-    
-    
-    // Extract the button for each item into a separate view
-    func categoryItem(category: Category) -> some View {
-        VStack(alignment: .leading, spacing: 20) {
-            HStack(spacing: 20) {
-                Circle()
-                    .fill(Color.purple)
-                    .frame(maxWidth: 50)
-                    .overlay(
-                        Text("B")
-                            .font(.title)
-                            .foregroundColor(.white)
-                    )
-                
-                TextField("Category name", text: $categoryName, prompt: Text(category.name).foregroundStyle(.white))
-                    .font(.headline)
-                    .padding()
-                    .foregroundStyle(.white)
-                    .background(Color.gray.opacity(0.2))
-                    .cornerRadius(10)
-            }
-            
-            HStack(spacing: 0) {
-                TextField("Allocated Amount", text: $categoryName, prompt: Text(String(category.allocatedAmount)).foregroundStyle(.white))
-                    .font(.headline)
-                    .padding()
-                    .foregroundStyle(.white)
-                    .background(Color.gray.opacity(0.2))
-                    .cornerRadius(10)
-                
-                VStack {
-                    CustomPicker(selection: self.$selectedTimeType) {
-                        TimeTypes.allCases
-                    }
-                }
-                
-                Button(action: {
-                    // Handle Action
-                }) {
-                    Circle()
-                        .fill(.red.opacity(0.2))
-                        .frame(maxWidth: 50)
-                        .overlay(
-                            Image(systemName: "trash")
-                                .foregroundStyle(.red)
-                        )
-                }
-            }
-            
-        }
-        .padding()
-        .background(RoundedRectangle(cornerRadius: 12).stroke(Color.gray.opacity(0.3), lineWidth: 1))
-    }
-    
+    // Track edits in a temporary array
+    @State private var editedCategories: [Category] = []
+    @State private var isLoading = false
+    @State private var errorMessage: String?
+
     var body: some View {
         VStack(alignment: .leading) {
-            HStack {
-                Text("Edit all categories")
-                    .font(.title)
-                    .bold()
-                
-                Spacer()
-                
-                Button(action: {
-                    // Handle Action
-                    presentationMode.wrappedValue.dismiss()
-                }) {
-                    Text("Edit")
-                        .foregroundStyle(.purple)
-                        .padding(.horizontal)
-                        .padding(.vertical, 10)
-                        .background(RoundedRectangle(cornerRadius: 12).fill(.purple.opacity(0.2)))
-                }
-            }
-            .padding()
+            headerView
             
             ScrollView {
-                ForEach(appDataViewModel.categories) { category in // Ensure we're using the instance variable
-                    categoryItem(category: category)
+                if isLoading {
+                    ProgressView("Loading categories...")
+                } else {
+                    ForEach($editedCategories) { $category in
+                        CategoryRowView(category: $category)
+                    }
                 }
             }
             .padding()
             .task {
-                do {
-                    try await appDataViewModel.fetchAllData()
-                } catch {
-                    // Handle error here, if necessary
-                    print("Error fetching categories: \(error)")
+                Task {
+                    await loadCategories() // Ensure loadData is called
                 }
+            }
+            .alert("Error", isPresented: .constant(errorMessage != nil), presenting: errorMessage) { _ in
+                Button("OK", role: .cancel) { errorMessage = nil }
+            } message: { errorMessage in
+                Text(errorMessage)
             }
         }
         .background(Color.black.opacity(0.9).edgesIgnoringSafeArea(.all))
         .foregroundColor(.white)
     }
+    
+    private var headerView: some View {
+        HStack {
+            Text("Edit all categories")
+                .font(.title)
+                .bold()
+            Spacer()
+            Button("Edit") {
+                Task { await commitChanges() }
+            }
+            .foregroundStyle(.purple)
+            .padding(.horizontal)
+            .padding(.vertical, 10)
+            .background(RoundedRectangle(cornerRadius: 12).fill(.purple.opacity(0.2)))
+        }
+        .padding()
+    }
+    
+    private func loadCategories() async {
+            isLoading = true
+            do {
+                try await appDataViewModel.fetchAllData()
+                editedCategories = appDataViewModel.categories // Copy categories for editing
+            } catch {
+                errorMessage = "Error fetching categories: \(error.localizedDescription)"
+            }
+            isLoading = false
+        }
+        
+        private func commitChanges() async {
+            isLoading = true
+            do {
+                try await appDataViewModel.updateCategories(editedCategories) // Update categories in bulk
+                
+                // Dismiss EditCategoriesView
+                presentationMode.wrappedValue.dismiss()
+            } catch {
+                errorMessage = "Error updating categories: \(error.localizedDescription)"
+            }
+            isLoading = false
+        }
 }
 
 #Preview {

@@ -56,22 +56,28 @@ final class AppDataViewModel: ObservableObject {
         try await fetchAllData()
     }
     
-    // Update category
-    func updateCategory(_ category: Category) async throws {
-        guard let id = category.id else {
-            print("Error: Can't update category \(String(describing: category.id))")
-            return
-        }
-        
-        try await supabaseService.getClient()
-            .from("categories")
-            .update(category)
-            .eq("id", value: id)
-            .execute()
-        
-        // Refresh categories after updating
-        try await fetchAllData()
-    }
+    // Bulk update categories
+       func updateCategories(_ categories: [Category]) async throws {
+           for category in categories {
+               try await updateCategory(category)
+           }
+           
+           try await fetchAllData()
+       }
+       
+       // Single category update function
+       func updateCategory(_ category: Category) async throws {
+           guard let id = category.id else {
+               print("Error: Can't update category \(String(describing: category.id))")
+               return
+           }
+           
+           try await supabaseService.getClient()
+               .from("categories")
+               .update(category)
+               .eq("id", value: id)
+               .execute()
+       }
     
     // Delete category
     func deleteCategory(at id: UUID) async throws {

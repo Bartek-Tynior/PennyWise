@@ -5,8 +5,8 @@
 //  Created by Bart Tynior on 22/10/2024.
 //
 
-import Foundation
 import Combine
+import Foundation
 
 class DashboardViewModel: ObservableObject {
     @Published var totalBudgeted: Double = 0.0
@@ -16,21 +16,21 @@ class DashboardViewModel: ObservableObject {
 
     func calculateCategoryBalances(categories: [Category], transactions: [Transaction]) {
         var balances = [UUID: Double]()
-        
+
         for category in categories {
             let categoryTransactions = transactions.filter { $0.categoryId == category.id }
             let totalSpent = categoryTransactions.reduce(0.0) { $0 + $1.amount }
             let remainingBalance = category.allocatedAmount - totalSpent
             balances[category.id!] = remainingBalance
         }
-        
-        self.categoryBalances = balances
+
+        categoryBalances = balances
     }
-    
+
     func calculateBudget(categories: [Category], transactions: [Transaction]) {
         let (budgeted, left) = calculateTotalBudgetedAndLeft(categories: categories, transactions: transactions)
-        self.totalBudgeted = budgeted
-        self.totalLeft = left
+        totalBudgeted = budgeted
+        totalLeft = left
         calculateCategoryBalances(categories: categories, transactions: transactions) // Call this to update balances
     }
 
@@ -55,7 +55,6 @@ class DashboardViewModel: ObservableObject {
                 totalSpent += categoryTransactions.reduce(0.0) { $0 + $1.amount }
             }
         }
-
 
         let totalLeft = totalBudgeted - totalSpent
         return (totalBudgeted, totalLeft)
