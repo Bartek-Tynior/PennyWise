@@ -18,7 +18,7 @@ struct CategoryRowView: View {
                     .fill(Color.purple)
                     .frame(width: 50)
                     .overlay(Text("B").font(.title).foregroundColor(.white))
-                
+
                 TextField("Category name", text: $category.name)
                     .font(.headline)
                     .padding()
@@ -26,7 +26,7 @@ struct CategoryRowView: View {
                     .cornerRadius(10)
                     .foregroundStyle(.white)
             }
-            
+
             HStack(spacing: 0) {
                 TextField("Allocated Amount", value: $category.allocatedAmount, format: .number)
                     .font(.headline)
@@ -34,13 +34,25 @@ struct CategoryRowView: View {
                     .background(Color.gray.opacity(0.2))
                     .cornerRadius(10)
                     .foregroundStyle(.white)
-                
-                CustomPicker(selection: $selectedPeriodicity) {
+
+                CustomPicker(selection: Binding(
+                    get: { selectedPeriodicity ?? category.periodicityEnum },
+                    set: { newValue in
+                        selectedPeriodicity = newValue
+                        if let newValue = newValue {
+                            category.periodicityEnum = newValue
+                        }
+                    }
+                )) {
                     Periodicity.allCases
                 }
             }
         }
         .padding()
         .background(RoundedRectangle(cornerRadius: 12).stroke(Color.gray.opacity(0.3), lineWidth: 1))
+        .onAppear {
+            // Initialize selectedPeriodicity with the current category periodicity
+            selectedPeriodicity = category.periodicityEnum
+        }
     }
 }

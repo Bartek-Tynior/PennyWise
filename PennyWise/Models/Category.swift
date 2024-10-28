@@ -14,7 +14,17 @@ struct Category: Identifiable, Codable, Hashable {
     var periodicity: String
     var createdAt: Date
     var userId: UUID
-    
+
+    // Computed property for working with Periodicity enum
+    var periodicityEnum: Periodicity {
+        get {
+            Periodicity(rawValue: periodicity) ?? .monthly
+        }
+        set {
+            periodicity = newValue.rawValue
+        }
+    }
+
     enum CodingKeys: String, CodingKey {
         case id, name, periodicity
         case allocatedAmount = "allocated_amount"
