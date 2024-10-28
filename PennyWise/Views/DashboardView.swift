@@ -10,99 +10,71 @@ import SwiftUI
 struct DashboardView: View {
     @State private var isShowingCategory = false
     @State private var isShowingTransaction = false
-
+    
     let cornerRadius: CGFloat = 12
-
+    
     @EnvironmentObject var appDataViewModel: AppDataViewModel
     @EnvironmentObject var authViewModel: AuthViewModel
     @EnvironmentObject var helperViewModel: HelperViewModel
-
+    
     var body: some View {
         VStack {
             TopNavBar()
-
-            // Monthly Overview
-            HStack {
-                VStack(alignment: .leading) {
-                    Text("Monthly")
-                        .font(.system(size: 16))
-                        .foregroundColor(.gray)
-                    Text("\(helperViewModel.daysLeftInMonth) days left")
-                }
-                Spacer()
-                VStack(alignment: .trailing) {
-                    Text("Budgeted")
-                        .font(.system(size: 16))
-                        .foregroundColor(.gray)
-                    Text("$\(helperViewModel.totalBudgeted, specifier: "%.2f")")
-                }
-                Spacer()
-                VStack(alignment: .trailing) {
-                    Text("Left")
-                        .font(.system(size: 16))
-                        .foregroundColor(.gray)
-                    Text("$\(helperViewModel.totalLeft, specifier: "%.2f")")
-                        .foregroundColor(helperViewModel.totalLeft >= 0 ? .green : .red)
-                }
+            
+            // Monthly Section
+            let monthlyCategories = appDataViewModel.categories.filter { $0.periodicity.caseInsensitiveCompare("monthly") == .orderedSame }
+            
+            if !monthlyCategories.isEmpty {
+                SectionView(
+                    title: "Monthly",
+                    daysLeft: helperViewModel.daysLeftInMonth,
+                    totalBudgeted: helperViewModel.totalMonthlyBudgeted,
+                    totalLeft: helperViewModel.totalMonthlyLeft,
+                    categories: monthlyCategories,
+                    helperViewModel: helperViewModel
+                )
             }
-            .padding(.vertical, 8)
-            .padding(.horizontal)
-            .background(.gray.opacity(0.2))
-            .cornerRadius(10)
+            
+            // Weekly Section
+            let weeklyCategories = appDataViewModel.categories.filter { $0.periodicity.caseInsensitiveCompare("weekly") == .orderedSame }
+            
+            if !weeklyCategories.isEmpty {
+                SectionView(
+                    title: "Weekly",
+                    daysLeft: helperViewModel.daysLeftInWeek,
+                    totalBudgeted: helperViewModel.totalWeeklyBudgeted,
+                    totalLeft: helperViewModel.totalWeeklyLeft,
+                    categories: weeklyCategories,
+                    helperViewModel: helperViewModel
+                )
+            }
+            
+            // Add Category Button
+            Button(action: {
+                isShowingCategory.toggle()
+            }) {
+                Text("Add new category")
+                    .foregroundColor(.purple)
+                    .fontWeight(.semibold)
+            }
+            .frame(maxWidth: .infinity)
             .padding()
-
-            // List of Categories
-            ScrollView {
-                VStack(spacing: 15) {
-                    ForEach(appDataViewModel.categories) { category in
-                        let remainingBalance = helperViewModel.categoryBalances[category.id!] ?? category.allocatedAmount
-
-                        HStack {
-                            Text(category.name)
-                            Spacer()
-                            Text("$\(category.allocatedAmount, specifier: "%.2f")")
-                            Spacer()
-                            Text("$\(remainingBalance, specifier: "%.2f")")
-                                .foregroundColor(remainingBalance >= 0 ? .green : .red)
-                                .background(
-                                    RoundedRectangle(cornerRadius: cornerRadius)
-                                        .fill(remainingBalance >= 0 ? .green.opacity(0.2) : .red.opacity(0.2))
-                                        .frame(width: textWidth(for: String(remainingBalance)))
-                                )
-                        }
-                        .padding()
-                        .background(RoundedRectangle(cornerRadius: 12).stroke(Color.gray.opacity(0.3), lineWidth: 1))
-                    }
-
-                    Button(action: {
-                        isShowingCategory.toggle()
-                    }) {
-                        Text("Add new category")
-                            .foregroundColor(.purple)
-                            .fontWeight(.semibold)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(RoundedRectangle(cornerRadius: 12).fill(.gray.opacity(0.1)))
-                    .sheet(isPresented: $isShowingCategory) {
-                        AddCategoryView()
-                    }
-                }
+            .background(RoundedRectangle(cornerRadius: 12).fill(.gray.opacity(0.1)))
+            .sheet(isPresented: $isShowingCategory) {
+                AddCategoryView()
             }
-            .padding(.horizontal)
-            .onAppear {
-                helperViewModel.calculateDaysLeftInMonth()
-                if appDataViewModel.categories.isEmpty || appDataViewModel.transactions.isEmpty {
-                    Task {
-                        await loadData() // Ensure loadData is called
-                    }
-                } else {
-                    // Call this if data is already loaded, otherwise it will happen after load
-                    helperViewModel.calculateBudget(categories: appDataViewModel.categories, transactions: appDataViewModel.transactions)
-                }
+            
+            Spacer()
+        }
+        .padding(.horizontal)
+        .onAppear {
+            helperViewModel.calculateDaysLeftInMonth()
+            helperViewModel.calculateDaysLeftInWeek()
+            Task {
+                await loadData()
             }
         }
-
+        
         // Floating Action Button (FAB)
         ZStack {
             HStack {
@@ -125,20 +97,85 @@ struct DashboardView: View {
             }
         }
     }
-
+    
     func loadData() async {
         do {
-            // Fetch categories and transactions via the global AppDataViewModel
             try await appDataViewModel.fetchAllData()
-
-            // Recalculate budget after data is fetched
             helperViewModel.calculateBudget(categories: appDataViewModel.categories, transactions: appDataViewModel.transactions)
         } catch {
             print("Error fetching data: \(error)")
         }
     }
+}
 
-    // Function to calculate the width based on text
+// Reusable Section View for Monthly and Weekly
+struct SectionView: View {
+    let title: String
+    let daysLeft: Int
+    let totalBudgeted: Double
+    let totalLeft: Double
+    let categories: [Category]
+    let helperViewModel: HelperViewModel
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            // Header
+            HStack {
+                VStack(alignment: .leading) {
+                    Text(title)
+                        .font(.system(size: 16))
+                        .foregroundColor(.gray)
+                    Text("\(daysLeft) days left")
+                }
+                Spacer()
+                VStack(alignment: .trailing) {
+                    Text("Budgeted")
+                        .font(.system(size: 16))
+                        .foregroundColor(.gray)
+                    Text("$\(totalBudgeted, specifier: "%.2f")")
+                }
+                Spacer()
+                VStack(alignment: .trailing) {
+                    Text("Left")
+                        .font(.system(size: 16))
+                        .foregroundColor(.gray)
+                    Text("$\(totalLeft, specifier: "%.2f")")
+                        .foregroundColor(totalLeft >= 0 ? .green : .red)
+                }
+            }
+            .padding(.vertical, 8)
+            .padding(.horizontal)
+            .background(Color.gray.opacity(0.2))
+            .cornerRadius(10)
+            .padding(.bottom, 8)
+            
+            // Categories List
+            VStack(spacing: 15) {
+                ForEach(categories) { category in
+                    let remainingBalance = helperViewModel.categoryBalances[category.id!] ?? category.allocatedAmount
+                    
+                    HStack {
+                        Text(category.name)
+                        Spacer()
+                        Text("$\(category.allocatedAmount, specifier: "%.2f")")
+                        Spacer()
+                        Text("$\(remainingBalance, specifier: "%.2f")")
+                            .foregroundColor(remainingBalance >= 0 ? .green : .red)
+                            .background(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(remainingBalance >= 0 ? .green.opacity(0.2) : .red.opacity(0.2))
+                                    .frame(width: textWidth(for: String(remainingBalance)))
+                            )
+                    }
+                    .padding()
+                    .background(RoundedRectangle(cornerRadius: 12).stroke(Color.gray.opacity(0.3), lineWidth: 1))
+                }
+            }
+        }
+        .padding(.vertical)
+    }
+    
+    // Utility function for text width calculation
     func textWidth(for text: String) -> CGFloat {
         let font = UIFont.systemFont(ofSize: 14)
         let attributes = [NSAttributedString.Key.font: font]
