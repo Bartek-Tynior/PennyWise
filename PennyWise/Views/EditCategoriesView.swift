@@ -9,7 +9,8 @@ import SwiftUI
 
 struct EditCategoriesView: View {
     @Environment(\.presentationMode) var presentationMode
-    @EnvironmentObject var appDataViewModel: AppDataViewModel // Access the shared AppDataViewModel
+    @EnvironmentObject var appDataViewModel: AppDataViewModel
+    @EnvironmentObject var helperViewModel: HelperViewModel
 
     // Track edits in a temporary array
     @State private var editedCategories: [Category] = []
@@ -76,6 +77,8 @@ struct EditCategoriesView: View {
         do {
             try await appDataViewModel.updateCategories(editedCategories) // Update categories in bulk
             try await appDataViewModel.fetchAllData()
+            helperViewModel.calculateBudget(categories: appDataViewModel.categories, transactions: appDataViewModel.transactions)
+            helperViewModel.calculateDaysLeftInMonth()
                 
             // Dismiss EditCategoriesView
             presentationMode.wrappedValue.dismiss()

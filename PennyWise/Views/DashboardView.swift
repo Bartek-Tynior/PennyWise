@@ -15,7 +15,7 @@ struct DashboardView: View {
 
     @EnvironmentObject var appDataViewModel: AppDataViewModel
     @EnvironmentObject var authViewModel: AuthViewModel
-    @StateObject private var dashboardViewModel = DashboardViewModel()
+    @EnvironmentObject var helperViewModel: HelperViewModel
 
     var body: some View {
         VStack {
@@ -27,22 +27,22 @@ struct DashboardView: View {
                     Text("Monthly")
                         .font(.system(size: 16))
                         .foregroundColor(.gray)
-                    Text("\(dashboardViewModel.daysLeftInMonth) days left")
+                    Text("\(helperViewModel.daysLeftInMonth) days left")
                 }
                 Spacer()
                 VStack(alignment: .trailing) {
                     Text("Budgeted")
                         .font(.system(size: 16))
                         .foregroundColor(.gray)
-                    Text("$\(dashboardViewModel.totalBudgeted, specifier: "%.2f")")
+                    Text("$\(helperViewModel.totalBudgeted, specifier: "%.2f")")
                 }
                 Spacer()
                 VStack(alignment: .trailing) {
                     Text("Left")
                         .font(.system(size: 16))
                         .foregroundColor(.gray)
-                    Text("$\(dashboardViewModel.totalLeft, specifier: "%.2f")")
-                        .foregroundColor(dashboardViewModel.totalLeft >= 0 ? .green : .red)
+                    Text("$\(helperViewModel.totalLeft, specifier: "%.2f")")
+                        .foregroundColor(helperViewModel.totalLeft >= 0 ? .green : .red)
                 }
             }
             .padding(.vertical, 8)
@@ -55,7 +55,7 @@ struct DashboardView: View {
             ScrollView {
                 VStack(spacing: 15) {
                     ForEach(appDataViewModel.categories) { category in
-                        let remainingBalance = dashboardViewModel.categoryBalances[category.id!] ?? category.allocatedAmount
+                        let remainingBalance = helperViewModel.categoryBalances[category.id!] ?? category.allocatedAmount
 
                         HStack {
                             Text(category.name)
@@ -91,14 +91,14 @@ struct DashboardView: View {
             }
             .padding(.horizontal)
             .onAppear {
-                dashboardViewModel.calculateDaysLeftInMonth()
+                helperViewModel.calculateDaysLeftInMonth()
                 if appDataViewModel.categories.isEmpty || appDataViewModel.transactions.isEmpty {
                     Task {
                         await loadData() // Ensure loadData is called
                     }
                 } else {
                     // Call this if data is already loaded, otherwise it will happen after load
-                    dashboardViewModel.calculateBudget(categories: appDataViewModel.categories, transactions: appDataViewModel.transactions)
+                    helperViewModel.calculateBudget(categories: appDataViewModel.categories, transactions: appDataViewModel.transactions)
                 }
             }
         }
@@ -132,7 +132,7 @@ struct DashboardView: View {
             try await appDataViewModel.fetchAllData()
 
             // Recalculate budget after data is fetched
-            dashboardViewModel.calculateBudget(categories: appDataViewModel.categories, transactions: appDataViewModel.transactions)
+            helperViewModel.calculateBudget(categories: appDataViewModel.categories, transactions: appDataViewModel.transactions)
         } catch {
             print("Error fetching data: \(error)")
         }

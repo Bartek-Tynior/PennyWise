@@ -1,14 +1,14 @@
 //
-//  DashboardViewModel.swift
+//  HelperViewModel.swift
 //  PennyWise
 //
-//  Created by Bart Tynior on 22/10/2024.
+//  Created by Bart Tynior on 28/10/2024.
 //
 
 import Combine
 import Foundation
 
-class DashboardViewModel: ObservableObject {
+class HelperViewModel: ObservableObject {
     @Published var totalBudgeted: Double = 0.0
     @Published var totalLeft: Double = 0.0
     @Published var daysLeftInMonth: Int = 0
