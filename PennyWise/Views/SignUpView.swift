@@ -26,24 +26,36 @@ struct SignUpView: View {
                     .fontWeight(.semibold)
                     .foregroundColor(.purple)
             }
+            .padding(.bottom, 40)
             
-            TextField("Name", text: $authViewModel.name)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .padding(.horizontal, 40)
+            TextField("Name", text: $authViewModel.name, prompt: Text("Your name").foregroundStyle(.gray))
+                .font(.headline)
+                .padding()
+                .foregroundStyle(.white)
+                .background(Color.gray.opacity(0.2))
+                .cornerRadius(10)
+                .padding(.horizontal)
             
-            TextField("Email", text: $authViewModel.email)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .padding(.horizontal, 40)
+            TextField("Email", text: $authViewModel.email, prompt: Text("Your email").foregroundStyle(.gray))
+                .font(.headline)
+                .padding()
+                .foregroundStyle(.white)
+                .background(Color.gray.opacity(0.2))
+                .cornerRadius(10)
+                .padding(.horizontal)
             
-            SecureField("Password", text: $authViewModel.password)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .padding(.horizontal, 40)
-                .padding(.bottom, 10)
+            SecureField("Password", text: $authViewModel.password, prompt: Text("Your password").foregroundStyle(.gray))
+                .font(.headline)
+                .padding()
+                .foregroundStyle(.white)
+                .background(Color.gray.opacity(0.2))
+                .cornerRadius(10)
+                .padding(.horizontal)
             
             Text("Use at least 6 characters including a number and a symbol.")
                 .font(.footnote)
                 .foregroundColor(.gray)
-                .padding(.horizontal, 40)
+                .padding(.vertical, 10)
             
             Spacer()
             
@@ -85,11 +97,5 @@ struct SignUpView: View {
         }
         .background(Color.black.opacity(0.9).edgesIgnoringSafeArea(.all))
         .foregroundColor(.white)
-    }
-}
-
-struct SignUpView_Previews: PreviewProvider {
-    static var previews: some View {
-        SignUpView()
     }
 }

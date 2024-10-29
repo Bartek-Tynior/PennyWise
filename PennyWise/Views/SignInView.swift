@@ -91,9 +91,3 @@ struct SignInView: View {
         .foregroundColor(.white)
     }
 }
-
-struct SignInView_Previews: PreviewProvider {
-    static var previews: some View {
-        SignInView()
-    }
-}
