@@ -4,21 +4,31 @@
 //
 //  Created by Bart Tynior on 11/10/2024.
 //
+
 import SwiftUI
 
 struct TransactionsView: View {
     @State private var selectedTab: String = "All Month"
     @State private var isShowingTransaction = false
-    
+
     @StateObject private var appDataViewModel = AppDataViewModel()
-        
+
+    // Group transactions by date
+    var groupedTransactions: [String: [Transaction]] {
+        Dictionary(grouping: appDataViewModel.transactions) { transaction in
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "dd MMMM"
+            return dateFormatter.string(from: transaction.createdAt) // Format as "28 October"
+        }
+    }
+
     var body: some View {
         VStack(alignment: .leading) {
             Text("Transactions")
                 .font(.title)
                 .bold()
                 .padding(.horizontal)
-                
+            
             // Tabs for All Month and This Week
             HStack {
                 Button(action: {
@@ -31,7 +41,7 @@ struct TransactionsView: View {
                 }
                 .background(selectedTab == "All Month" ? Color.purple.opacity(0.2) : Color.clear)
                 .cornerRadius(10)
-                    
+
                 Button(action: {
                     selectedTab = "This Week"
                 }) {
@@ -42,24 +52,43 @@ struct TransactionsView: View {
                 }
                 .background(selectedTab == "This Week" ? Color.purple.opacity(0.2) : Color.clear)
                 .cornerRadius(10)
-                    
+
                 Spacer()
             }
             .padding()
-                
+
             // Transactions List
             ScrollView {
                 VStack(spacing: 15) {
-                    ForEach(appDataViewModel.transactions) { transaction in
-                        HStack {
-                            Text(transaction.description)
-                                            
-                            Spacer()
-                                            
-                            Text("$\(transaction.amount, specifier: "%.2f")")
+                    ForEach(groupedTransactions.keys.sorted(by: >), id: \.self) { date in
+                        // Section for each date
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text(date) // Date header, e.g., "28 October"
+                                .font(.headline)
+                                .padding(.leading)
+                                .padding(.top)
+
+                            ForEach(groupedTransactions[date]!) { transaction in
+                                HStack {
+                                    // Optional icon for category (replace with actual category icon if available)
+                                    Image(systemName: "cart.fill")
+                                        .foregroundColor(.purple)
+                                    
+                                    VStack(alignment: .leading) {
+                                        Text(transaction.description)
+                                            .font(.subheadline)
+                                            .foregroundColor(.gray)
+                                    }
+
+                                    Spacer()
+                                    
+                                    Text("$\(transaction.amount, specifier: "%.2f")")
+                                        .font(.subheadline)
+                                }
+                                .padding()
+                                .background(RoundedRectangle(cornerRadius: 12).stroke(Color.gray.opacity(0.3), lineWidth: 1))
+                            }
                         }
-                        .padding()
-                        .background(RoundedRectangle(cornerRadius: 12).stroke(Color.gray.opacity(0.3), lineWidth: 1))
                     }
                 }
             }
@@ -68,11 +97,10 @@ struct TransactionsView: View {
                 do {
                     try await appDataViewModel.fetchAllData()
                 } catch {
-                    // Handle error here, if necessary
                     print("Error fetching transactions: \(error)")
                 }
             }
-                
+
             // Floating Action Button (FAB)
             ZStack {
                 HStack {
