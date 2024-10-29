@@ -64,6 +64,7 @@ struct AddTransactionFlowView: View {
         
         Task {
             try? await appDataViewModel.addTransaction(transaction)
+            try await appDataViewModel.fetchAllData()
         }
     }
 }

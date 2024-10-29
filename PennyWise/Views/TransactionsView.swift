@@ -8,17 +8,33 @@
 import SwiftUI
 
 struct TransactionsView: View {
-    @State private var selectedTab: String = "All Month"
+    @State private var selectedTab: String = "All" // Updated default to "All"
     @State private var isShowingTransaction = false
 
     @StateObject private var appDataViewModel = AppDataViewModel()
 
-    // Group transactions by date
+    // Filtered transactions based on the selected tab
+    var filteredTransactions: [Transaction] {
+        switch selectedTab {
+        case "All Month":
+            return appDataViewModel.transactions.filter { transaction in
+                Calendar.current.isDate(transaction.createdAt, equalTo: Date(), toGranularity: .month)
+            }
+        case "This Week":
+            return appDataViewModel.transactions.filter { transaction in
+                Calendar.current.isDate(transaction.createdAt, equalTo: Date(), toGranularity: .weekOfYear)
+            }
+        default: // "All"
+            return appDataViewModel.transactions
+        }
+    }
+
+    // Group filtered transactions by date
     var groupedTransactions: [String: [Transaction]] {
-        Dictionary(grouping: appDataViewModel.transactions) { transaction in
+        Dictionary(grouping: filteredTransactions) { transaction in
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "dd MMMM"
-            return dateFormatter.string(from: transaction.createdAt) // Format as "28 October"
+            return dateFormatter.string(from: transaction.createdAt)
         }
     }
 
@@ -29,29 +45,11 @@ struct TransactionsView: View {
                 .bold()
                 .padding(.horizontal)
             
-            // Tabs for All Month and This Week
+            // Tabs for All, All Month, and This Week
             HStack {
-                Button(action: {
-                    selectedTab = "All Month"
-                }) {
-                    Text("All Month")
-                        .fontWeight(selectedTab == "All Month" ? .bold : .semibold)
-                        .foregroundColor(selectedTab == "All Month" ? .purple : .gray)
-                        .padding()
-                }
-                .background(selectedTab == "All Month" ? Color.purple.opacity(0.2) : Color.clear)
-                .cornerRadius(10)
-
-                Button(action: {
-                    selectedTab = "This Week"
-                }) {
-                    Text("This Week")
-                        .fontWeight(selectedTab == "This Week" ? .bold : .semibold)
-                        .foregroundColor(selectedTab == "This Week" ? .purple : .gray)
-                        .padding()
-                }
-                .background(selectedTab == "This Week" ? Color.purple.opacity(0.2) : Color.clear)
-                .cornerRadius(10)
+                TabButton(title: "All", selectedTab: $selectedTab)
+                TabButton(title: "All Month", selectedTab: $selectedTab)
+                TabButton(title: "This Week", selectedTab: $selectedTab)
 
                 Spacer()
             }
@@ -122,6 +120,25 @@ struct TransactionsView: View {
                     }
                 }
             }
+        }
+    }
+}
+
+// Custom button view for tabs
+struct TabButton: View {
+    let title: String
+    @Binding var selectedTab: String
+
+    var body: some View {
+        Button(action: {
+            selectedTab = title
+        }) {
+            Text(title)
+                .fontWeight(selectedTab == title ? .bold : .semibold)
+                .foregroundColor(selectedTab == title ? .purple : .gray)
+                .padding()
+                .background(selectedTab == title ? Color.purple.opacity(0.2) : Color.clear)
+                .cornerRadius(10)
         }
     }
 }
