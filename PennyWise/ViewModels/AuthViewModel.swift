@@ -20,7 +20,6 @@ class AuthViewModel: ObservableObject {
     // Sign up a new user
     func signUp() async throws {
         _ = try await supabaseService.signUp(email: email, password: password)
-        await checkSession()
     }
 
     // Log in an existing user

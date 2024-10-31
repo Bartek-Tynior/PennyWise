@@ -105,7 +105,7 @@ struct CategoryRow: View {
                 .scaledToFit()
                 .frame(width: 40, height: 40)
             
-            Text(category.name ?? "Unknown") // Display category name
+            Text(category.name) // Display category name
                 .font(.headline)
                 .foregroundColor(.white)
             

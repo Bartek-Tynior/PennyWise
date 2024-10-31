@@ -88,8 +88,3 @@ struct EditCategoriesView: View {
         isLoading = false
     }
 }
-
-#Preview {
-    EditCategoriesView()
-        .preferredColorScheme(.dark)
-}

@@ -15,7 +15,7 @@ final class AppDataViewModel: ObservableObject {
     
     private let supabaseService = SupabaseService.shared
 
-    // Fetch both categories and transactions
+    // Fetch both categories and transactions for the current user
     func fetchAllData() async throws {
         async let categories = fetchCategories()
         async let transactions = fetchTransactions()
@@ -25,21 +25,33 @@ final class AppDataViewModel: ObservableObject {
         self.transactions = try await transactions
     }
     
-    // Fetch categories
+    // Fetch categories for the current user
     private func fetchCategories() async throws -> [Category] {
+        guard let userId = supabaseService.getClient().auth.currentUser?.id else {
+            print("Error: User not authenticated.")
+            return []
+        }
+        
         let categories: [Category] = try await supabaseService.getClient()
             .from("categories")
             .select()
+            .eq("user_id", value: userId) // Filter by user ID
             .execute()
             .value
         return categories
     }
     
-    // Fetch transactions
+    // Fetch transactions for the current user
     private func fetchTransactions() async throws -> [Transaction] {
+        guard let userId = supabaseService.getClient().auth.currentUser?.id else {
+            print("Error: User not authenticated.")
+            return []
+        }
+        
         let transactions: [Transaction] = try await supabaseService.getClient()
             .from("transactions")
             .select()
+            .eq("user_id", value: userId) // Filter by user ID
             .execute()
             .value
         return transactions
@@ -56,29 +68,56 @@ final class AppDataViewModel: ObservableObject {
         try await fetchAllData()
     }
     
+    // Add multiple new categories (for new user setup)
+    func addNewCategories(_ categories: [CategoryRecommendation]) async throws {
+        guard let userId = supabaseService.getClient().auth.currentUser?.id else {
+            print("Error: User not authenticated.")
+            return
+        }
+        
+        let newCategories = categories.map { recommendation in
+            Category(
+                id: UUID(),
+                name: recommendation.name,
+                allocatedAmount: recommendation.allocatedAmount,
+                periodicity: recommendation.periodicity,
+                createdAt: Date(),
+                userId: userId
+            )
+        }
+        
+        try await supabaseService.getClient()
+            .from("categories")
+            .insert(newCategories)
+            .execute()
+        
+        // Refresh categories after bulk insert
+        try await fetchAllData()
+    }
+    
     // Bulk update categories
-       func updateCategories(_ categories: [Category]) async throws {
-           for category in categories {
-               try await updateCategory(category)
-           }
-           
-           // Refresh categories after adding a new one
-           try await fetchAllData()
-       }
-       
-       // Single category update function
-       func updateCategory(_ category: Category) async throws {
-           guard let id = category.id else {
-               print("Error: Can't update category \(String(describing: category.id))")
-               return
-           }
-           
-           try await supabaseService.getClient()
-               .from("categories")
-               .update(category)
-               .eq("id", value: id)
-               .execute()
-       }
+    func updateCategories(_ categories: [Category]) async throws {
+        for category in categories {
+            try await updateCategory(category)
+        }
+        
+        // Refresh categories after update
+        try await fetchAllData()
+    }
+    
+    // Single category update function
+    func updateCategory(_ category: Category) async throws {
+        guard let id = category.id else {
+            print("Error: Can't update category \(String(describing: category.id))")
+            return
+        }
+        
+        try await supabaseService.getClient()
+            .from("categories")
+            .update(category)
+            .eq("id", value: id)
+            .execute()
+    }
     
     // Delete category
     func deleteCategory(at id: UUID) async throws {

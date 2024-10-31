@@ -54,7 +54,7 @@ struct WelcomeView: View {
                         .cornerRadius(30)
                 }
                 .sheet(isPresented: $isShowingSignUp) {
-                    SignUpView()
+                    NewUserFlowView()
                 }
 
                 Button(action: {
@@ -77,11 +77,5 @@ struct WelcomeView: View {
         }
         .background(Color.black.opacity(0.9).edgesIgnoringSafeArea(.all))
         .foregroundColor(.white)
-    }
-}
-
-struct WelcomeView_Previews: PreviewProvider {
-    static var previews: some View {
-        WelcomeView()
     }
 }

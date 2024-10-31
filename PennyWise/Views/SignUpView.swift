@@ -9,7 +9,7 @@ import SwiftUI
 
 struct SignUpView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
-    @Environment(\.presentationMode) var presentationMode
+    var onContinue: () -> Void
 
     var body: some View {
         VStack {
@@ -61,10 +61,7 @@ struct SignUpView: View {
             
             VStack(spacing: 10) {
                 Button(action: {
-                    Task {
-                        try await authViewModel.signUp()
-                        presentationMode.wrappedValue.dismiss()
-                    }
+                    onContinue()
                 }) {
                     Text("Sign Up")
                         .bold()
