@@ -10,6 +10,7 @@ import SwiftUI
 struct DashboardView: View {
     @State private var isShowingCategory = false
     @State private var isShowingTransaction = false
+    @State private var showCalendarModal = false
     
     let cornerRadius: CGFloat = 12
     
@@ -18,81 +19,104 @@ struct DashboardView: View {
     @EnvironmentObject var helperViewModel: HelperViewModel
     
     var body: some View {
-        VStack {
-            TopNavBar()
-            
-            // Monthly Section
-            let monthlyCategories = appDataViewModel.categories.filter { $0.periodicity.caseInsensitiveCompare("monthly") == .orderedSame }
-            
-            if !monthlyCategories.isEmpty {
-                SectionView(
-                    title: "Monthly",
-                    daysLeft: helperViewModel.daysLeftInMonth,
-                    totalBudgeted: helperViewModel.totalMonthlyBudgeted,
-                    totalLeft: helperViewModel.totalMonthlyLeft,
-                    categories: monthlyCategories,
-                    helperViewModel: helperViewModel
-                )
-            }
-            
-            // Weekly Section
-            let weeklyCategories = appDataViewModel.categories.filter { $0.periodicity.caseInsensitiveCompare("weekly") == .orderedSame }
-            
-            if !weeklyCategories.isEmpty {
-                SectionView(
-                    title: "Weekly",
-                    daysLeft: helperViewModel.daysLeftInWeek,
-                    totalBudgeted: helperViewModel.totalWeeklyBudgeted,
-                    totalLeft: helperViewModel.totalWeeklyLeft,
-                    categories: weeklyCategories,
-                    helperViewModel: helperViewModel
-                )
-            }
-            
-            // Add Category Button
-            Button(action: {
-                isShowingCategory.toggle()
-            }) {
-                Text("Add new category")
-                    .foregroundColor(.purple)
-                    .fontWeight(.semibold)
-            }
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(RoundedRectangle(cornerRadius: 12).fill(.gray.opacity(0.1)))
-            .sheet(isPresented: $isShowingCategory) {
-                AddCategoryView()
-            }
-            
-            Spacer()
-        }
-        .padding(.horizontal)
-        .onAppear {
-            helperViewModel.calculateDaysLeftInMonth()
-            helperViewModel.calculateDaysLeftInWeek()
-            Task {
-                await loadData()
-            }
-        }
-        
-        // Floating Action Button (FAB)
         ZStack {
-            HStack {
-                Spacer()
-                Button(action: {
-                    isShowingTransaction.toggle()
-                }) {
-                    Image(systemName: "plus")
-                        .font(.system(size: 24))
-                        .frame(width: 50, height: 50)
-                        .foregroundColor(.black.opacity(0.9))
-                        .background(Color.white)
-                        .clipShape(Circle())
+            // Main Dashboard Content
+            VStack {
+                TopNavBar(showModal: $showCalendarModal)
+                
+                // Monthly Section
+                let monthlyCategories = appDataViewModel.categories.filter { $0.periodicity.caseInsensitiveCompare("monthly") == .orderedSame }
+                
+                if !monthlyCategories.isEmpty {
+                    SectionView(
+                        title: "Monthly",
+                        daysLeft: helperViewModel.daysLeftInMonth,
+                        totalBudgeted: helperViewModel.totalMonthlyBudgeted,
+                        totalLeft: helperViewModel.totalMonthlyLeft,
+                        categories: monthlyCategories,
+                        helperViewModel: helperViewModel
+                    )
                 }
-                .padding(.trailing, 20)
-                .padding(.bottom, 20)
-                .sheet(isPresented: $isShowingTransaction) {
-                    AddTransactionFlowView()
+                
+                // Weekly Section
+                let weeklyCategories = appDataViewModel.categories.filter { $0.periodicity.caseInsensitiveCompare("weekly") == .orderedSame }
+                
+                if !weeklyCategories.isEmpty {
+                    SectionView(
+                        title: "Weekly",
+                        daysLeft: helperViewModel.daysLeftInWeek,
+                        totalBudgeted: helperViewModel.totalWeeklyBudgeted,
+                        totalLeft: helperViewModel.totalWeeklyLeft,
+                        categories: weeklyCategories,
+                        helperViewModel: helperViewModel
+                    )
+                }
+                
+                // Add Category Button
+                Button(action: {
+                    isShowingCategory.toggle()
+                }) {
+                    Text("Add new category")
+                        .foregroundColor(.purple)
+                        .fontWeight(.semibold)
+                }
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(RoundedRectangle(cornerRadius: 12).fill(.gray.opacity(0.1)))
+                .sheet(isPresented: $isShowingCategory) {
+                    AddCategoryView()
+                }
+                
+                Spacer()
+            }
+            .padding(.horizontal)
+            .onAppear {
+                helperViewModel.calculateDaysLeftInMonth()
+                helperViewModel.calculateDaysLeftInWeek()
+                Task {
+                    await loadData()
+                }
+            }
+            
+            // Calendar Modal Overlay
+            if showCalendarModal {
+                // Background Dimmed Layer
+                Color.black.opacity(0.4)
+                    .ignoresSafeArea()
+                    .onTapGesture {
+                        withAnimation {
+                            showCalendarModal = false
+                        }
+                    }
+                
+                // Calendar Modal View
+                CalendarModal(isPresented: $showCalendarModal, title: "Access photos?", message: "This lets you choose which photos you want to add to this project.", buttonTitle: "Give Access") {
+                    print("Pass to viewModel")
+                }
+                .transition(.opacity)
+                .zIndex(1)
+            }
+            
+            // Floating Action Button (FAB)
+            VStack {
+                Spacer()
+                HStack {
+                    Spacer()
+                    Button(action: {
+                        isShowingTransaction.toggle()
+                    }) {
+                        Image(systemName: "plus")
+                            .font(.system(size: 24))
+                            .frame(width: 50, height: 50)
+                            .foregroundColor(.black.opacity(0.9))
+                            .background(Color.white)
+                            .clipShape(Circle())
+                    }
+                    .padding(.trailing, 20)
+                    .padding(.bottom, 20)
+                    .sheet(isPresented: $isShowingTransaction) {
+                        AddTransactionFlowView()
+                    }
                 }
             }
         }

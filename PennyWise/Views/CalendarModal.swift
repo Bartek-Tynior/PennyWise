@@ -1,14 +1,14 @@
 //
-//  Modal.swift
+//  CalendarModal.swift
 //  PennyWise
 //
-//  Created by Bart Tynior on 05/11/2024.
+//  Created by Bart Tynior on 12/11/2024.
 //
 
 import SwiftUI
 
-struct Modal: View {
-    @Binding var showModal: Bool
+struct CalendarModal: View {
+    @Binding var isPresented: Bool
 
     let title: String
     let message: String
@@ -79,13 +79,7 @@ struct Modal: View {
     func close() {
         withAnimation(.spring()) {
             offset = 1000
-            showModal = false
+            isPresented = false
         }
-    }
-}
-
-struct CustomDialog_Previews: PreviewProvider {
-    static var previews: some View {
-        Modal(showModal: .constant(true), title: "Access photos?", message: "This lets you choose which photos you want to add to this project.", buttonTitle: "Give Access", action: {})
     }
 }

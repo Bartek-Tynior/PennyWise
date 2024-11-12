@@ -10,8 +10,8 @@ import SwiftUI
 struct TopNavBar: View {
     @State private var isShowingCategoryManagment = false
     @State private var isExpanded = false
-    @State private var showModal = false
-    
+    @Binding var showModal: Bool
+
     var body: some View {
         HStack {
             HStack(spacing: 0) {
@@ -25,21 +25,21 @@ struct TopNavBar: View {
                     .fontWeight(.semibold)
                     .foregroundColor(.purple)
             }
-            
+
             Spacer()
 
             HStack(spacing: 10) {
-                Button (action: {
+                Button(action: {
                     showModal.toggle()
                 }) {
                     Text("15 Jul - 22 Jul")
                         .font(.system(size: 18))
                         .fontWeight(.semibold)
                         .foregroundColor(.white)
-                    
+
                     Image(systemName: "chevron.down")
                 }
-                
+
                 Button(action: {
                     isShowingCategoryManagment.toggle()
                 }) {
@@ -56,15 +56,5 @@ struct TopNavBar: View {
             }
         }
         .padding()
-        
-        if showModal {
-                        Modal(showModal: $showModal, title: "Access photos?", message: "This lets you choose which photos you want to add to this project.", buttonTitle: "Give Access") {
-                            print("Pass to viewModel")
-                        }
-                    }
     }
-}
-
-#Preview {
-    TopNavBar()
 }
