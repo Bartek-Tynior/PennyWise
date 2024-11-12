@@ -11,7 +11,7 @@ struct SettingsView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
     @State private var name: String = ""
     @State private var email: String = ""
-    @State private var currency: String = "EUR"
+    @State private var selectedCurrency: Currency? = .usd
     @State private var reminderActivation: Bool = false
     @State private var showChangePasswordSheet = false
     @State private var showChangePassword = false
@@ -19,68 +19,65 @@ struct SettingsView: View {
     @State private var subscriptionExpirationDate = "30 October 2024"
     
     var body: some View {
-            VStack(alignment: .leading) {
-                Text("Settings")
-                    .font(.title)
-                    .bold()
-                    .padding(.horizontal)
+        VStack(alignment: .leading) {
+            Text("Settings")
+                .font(.title)
+                .bold()
+                .padding(.horizontal)
                 
-                ScrollView {
-                    Circle()
-                        .fill(Color.purple)
-                        .frame(width: 70, height: 70)
-                        .overlay(
-                            Text(name.prefix(1).uppercased())  // Display the first letter of the name
-                                .font(.title)
-                                .foregroundColor(.white)
-                        )
-                        .padding(.vertical, 10)
+            ScrollView {
+                Circle()
+                    .fill(Color.purple)
+                    .frame(width: 70, height: 70)
+                    .overlay(
+                        Text(name.prefix(1).uppercased()) // Display the first letter of the name
+                            .font(.title)
+                            .foregroundColor(.white)
+                    )
+                    .padding(.vertical, 10)
                     
-                    VStack(alignment: .leading, spacing: 10) {
-                        Section {
-                            TextField("Name", text: $name)
-                                .fontWeight(.semibold)
-                                .padding()
-                                .foregroundStyle(.white)
-                                .background(.gray.opacity(0.2))
-                                .cornerRadius(10)
-                            TextField("Email", text: $email)
-                                .fontWeight(.semibold)
-                                .padding()
-                                .foregroundStyle(.white)
-                                .background(.gray.opacity(0.2))
-                                .cornerRadius(10)
-                                .keyboardType(.emailAddress)
-                                .autocapitalization(.none)
-
-                            Button {
-                                showChangePasswordSheet = true
-                            } label: {
-                                Text("Change Password")
-                                    .fontWeight(.semibold)
-                                Spacer()
-                                Image(systemName: "chevron.right")
-                            }
-                            .padding()
-                            .foregroundStyle(.white)
-                            .background(.gray.opacity(0.2))
-                            .cornerRadius(10)
-                            .sheet(isPresented: $showChangePasswordSheet) {
-                                ChangePasswordView(showSheet: $showChangePasswordSheet)
-                            }
-                        } header: {
-                            Text("Account Settings")
-                                .fontWeight(.semibold)
-                                .padding(.top, 10)
-                        }
-                        
+                VStack(alignment: .leading, spacing: 10) {
                     Section {
-                        TextField("Currency", text: $currency)
+                        TextField("Name", text: $name)
                             .fontWeight(.semibold)
                             .padding()
                             .foregroundStyle(.white)
                             .background(.gray.opacity(0.2))
                             .cornerRadius(10)
+                        TextField("Email", text: $email)
+                            .fontWeight(.semibold)
+                            .padding()
+                            .foregroundStyle(.white)
+                            .background(.gray.opacity(0.2))
+                            .cornerRadius(10)
+                            .keyboardType(.emailAddress)
+                            .autocapitalization(.none)
+
+                        Button {
+                            showChangePasswordSheet = true
+                        } label: {
+                            Text("Change Password")
+                                .fontWeight(.semibold)
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                        }
+                        .padding()
+                        .foregroundStyle(.white)
+                        .background(.gray.opacity(0.2))
+                        .cornerRadius(10)
+                        .sheet(isPresented: $showChangePasswordSheet) {
+                            ChangePasswordView(showSheet: $showChangePasswordSheet)
+                        }
+                    } header: {
+                        Text("Account Settings")
+                            .fontWeight(.semibold)
+                            .padding(.top, 10)
+                    }
+                        
+                    Section {
+                        CustomPicker(selection: $selectedCurrency) {
+                            Currency.allCases
+                        }
                             
                         Toggle("Reminder Notification", isOn: $reminderActivation)
                             .fontWeight(.semibold)
@@ -174,21 +171,23 @@ struct SettingsView: View {
                 .padding()
             }
         }
-            .onAppear {
-                        Task {
-                            try await authViewModel.fetchUserProfile()
-                            updateViewFromProfile()
-                        }
-                    }
-                    .onChange(of: authViewModel.profile) { _ in
-                        updateViewFromProfile()
-                    }
-    }
-    // Update the view's state variables with the profile data
-        private func updateViewFromProfile() {
-            if let profile = authViewModel.profile?.first {
-                name = profile.name
-                email = profile.email
+        .onAppear {
+            Task {
+                try await authViewModel.fetchUserProfile()
+                updateViewFromProfile()
             }
         }
+        .onChange(of: authViewModel.profile) { _ in
+            updateViewFromProfile()
+        }
+    }
+
+    // Update the view's state variables with the profile data
+    private func updateViewFromProfile() {
+        if let profile = authViewModel.profile?.first {
+            name = profile.name
+            email = profile.email
+            selectedCurrency = Currency.fromString(profile.chosenCurrency) ?? .usd
+        }
+    }
 }
