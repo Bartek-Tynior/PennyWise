@@ -10,8 +10,8 @@ import SwiftUI
 struct DashboardView: View {
     @State private var isShowingCategory = false
     @State private var isShowingTransaction = false
-    @State private var showCalendarModal = false
-    
+    @Binding var showCalendarModal: Bool
+
     let cornerRadius: CGFloat = 12
     
     @EnvironmentObject var appDataViewModel: AppDataViewModel
@@ -76,25 +76,6 @@ struct DashboardView: View {
                 Task {
                     await loadData()
                 }
-            }
-            
-            // Calendar Modal Overlay
-            if showCalendarModal {
-                // Background Dimmed Layer
-                Color.black.opacity(0.4)
-                    .ignoresSafeArea()
-                    .onTapGesture {
-                        withAnimation {
-                            showCalendarModal = false
-                        }
-                    }
-                
-                // Calendar Modal View
-                CalendarModal(isPresented: $showCalendarModal, title: "Access photos?", message: "This lets you choose which photos you want to add to this project.", buttonTitle: "Give Access") {
-                    print("Pass to viewModel")
-                }
-                .transition(.opacity)
-                .zIndex(1)
             }
             
             // Floating Action Button (FAB)
