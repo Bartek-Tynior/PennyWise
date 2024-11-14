@@ -37,14 +37,7 @@ struct MainContainerView: View {
                         }
                     }
 
-                CalendarModal(
-                    isPresented: $showCalendarModal,
-                    title: "Access photos?",
-                    message: "This lets you choose which photos you want to add to this project.",
-                    buttonTitle: "Give Access"
-                ) {
-                    print("Pass to viewModel")
-                }
+                CalendarModal(isPresented: $showCalendarModal)
                 .transition(.opacity)
                 .zIndex(1)
             }
