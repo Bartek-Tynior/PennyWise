@@ -128,7 +128,3 @@ struct AddCategoryView: View {
         
     }
 }
-
-#Preview {
-    AddCategoryView()
-}

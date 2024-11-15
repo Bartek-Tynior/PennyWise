@@ -16,27 +16,47 @@ struct CalendarModal: View {
     var body: some View {
         ZStack {
             Color.black.opacity(0.5)
-                .onTapGesture { close() }
+                .onTapGesture {
+                    withAnimation {
+                        isPresented.toggle()
+                    }
+                }
 
             VStack(spacing: 20) {
                 // Header with title and close button
                 HStack {
-                    Text("Select date range")
-                        .font(.title3)
+                    Text("Select Week")
+                        .font(.title2)
                         .bold()
                         .foregroundColor(.white)
                     
                     Spacer()
                     
-                    Button(action: close) {
-                        Image(systemName: "xmark")
-                            .font(.title3)
-                            .foregroundColor(.white)
+                    // Buttons at the top-right corner
+                    HStack(spacing: 10) {
+                        // Close Button
+                        Button(action: {
+                            withAnimation {
+                                isPresented.toggle()
+                            }
+                        }) {
+                            Image(systemName: "xmark")
+                                .font(.system(size: 18, weight: .bold))
+                                .foregroundStyle(Color.white.opacity(0.8))
+                                .frame(width: 30, height: 30)
+                                .background(.black.opacity(0.5))
+                                .clipShape(Circle())
+                        }
                     }
-                    .padding(.trailing, 10)
+                    .frame(maxWidth: .infinity, alignment: .topTrailing)
                 }
-                .padding(.top, 10)
-                .padding(.horizontal, 20)
+                .padding(.top)
+                .padding(.horizontal)
+                
+                Divider()
+                    .frame(height: 2)
+                    .overlay(.white.opacity(0.5))
+                    .padding(.horizontal)
                 
                 // Month navigation and calendar grid
                 VStack(spacing: 15) {
@@ -70,32 +90,58 @@ struct CalendarModal: View {
                         currentMonth: $currentMonth
                     )
                 }
-                .padding(.horizontal)
                 
-                // Reset Button
-                Button(action: resetSelection) {
-                    Text("Reset Selection")
-                        .font(.subheadline)
-                        .foregroundColor(.white)
+                Divider()
+                    .frame(height: 2)
+                    .overlay(.white.opacity(0.5))
+                    .padding(.horizontal)
+                
+                VStack(spacing: 20) {
+                    Text("Quick selection")
+                    
+                    HStack(spacing: 10) {
+                        // Add Category Button
+                        Button(action: {
+                        }) {
+                            Text("Previous Week")
+                                .foregroundColor(.purple)
+                                .fontWeight(.semibold)
+                        }
+                        .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Color.red)
-                        .cornerRadius(10)
+                        .background(RoundedRectangle(cornerRadius: 12).fill(.gray.opacity(0.1)))
+                        
+                        // Add Category Button
+                        Button(action: {
+                        }) {
+                            Text("Current Week")
+                                .foregroundColor(.purple)
+                                .fontWeight(.semibold)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(RoundedRectangle(cornerRadius: 12).fill(.gray.opacity(0.1)))
+                        
+                        // Add Category Button
+                        Button(action: {
+                        }) {
+                            Text("Next Week")
+                                .foregroundColor(.purple)
+                                .fontWeight(.semibold)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(RoundedRectangle(cornerRadius: 12).fill(.gray.opacity(0.1)))
+                    }
                 }
+                .padding()
+
             }
-            .background(Color.gray)
+            .background(Color("Secondary"))
             .cornerRadius(10)
-            .shadow(radius: 10)
             .padding()
             .offset(y: isPresented ? 0 : UIScreen.main.bounds.height)
             .animation(.spring(), value: isPresented)
-        }
-        .ignoresSafeArea()
-    }
-    
-    // Helper functions
-    func close() {
-        withAnimation {
-            isPresented = false
         }
     }
     
@@ -132,7 +178,7 @@ struct CalendarGrid: View {
                 ForEach(daysOfWeek, id: \.self) { day in
                     Text(day)
                         .font(.subheadline)
-                        .foregroundColor(.white)
+                        .foregroundColor(.white.opacity(0.4))
                         .frame(maxWidth: .infinity)
                 }
             }
@@ -150,8 +196,8 @@ struct CalendarGrid: View {
                             
                             Text("\(Calendar.current.component(.day, from: dayDate))")
                                 .frame(maxWidth: .infinity, minHeight: 30)
-                                .background(isSelectedDay ? Color.blue : (isInRange ? Color.blue.opacity(0.3) : Color.clear))
-                                .foregroundColor(isInCurrentMonth ? (isSelectedDay ? .white : .white) : .gray) // Gray for previous/next month dates
+                                .background(isSelectedDay ? Color("Primary") : (isInRange ? Color("Primary").opacity(0.3) : Color.clear))
+                                .foregroundColor(isInCurrentMonth ? (isSelectedDay ? .white : .white) : .clear) // Gray for previous/next month dates
                                 .clipShape(Circle())
                                 .onTapGesture { if isInCurrentMonth { selectDate(dayDate) } }
                         } else {
