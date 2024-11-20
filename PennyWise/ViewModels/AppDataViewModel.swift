@@ -68,32 +68,36 @@ final class AppDataViewModel: ObservableObject {
         try await fetchAllData()
     }
     
-    // Add multiple new categories (for new user setup)
-    func addNewCategories(_ categories: [CategoryRecommendation]) async throws {
-        guard let userId = supabaseService.getClient().auth.currentUser?.id else {
-            print("Error: User not authenticated.")
-            return
+    // Add user profile
+        func createUsersProfile(_ profile: Profile) async throws {
+            try await supabaseService.getClient()
+                .from("profiles")
+                .insert(profile)
+                .execute()
         }
-        
-        let newCategories = categories.map { recommendation in
-            Category(
-                id: UUID(),
-                name: recommendation.name,
-                allocatedAmount: recommendation.allocatedAmount,
-                periodicity: recommendation.periodicity,
-                createdAt: Date(),
-                userId: userId
-            )
+
+        // Add multiple new categories for a new user
+        func addNewCategories(_ categories: [CategoryRecommendation]) async throws {
+            guard let userId = supabaseService.getClient().auth.currentUser?.id else {
+                throw NSError(domain: "Auth", code: 401, userInfo: [NSLocalizedDescriptionKey: "User not authenticated."])
+            }
+
+            let newCategories = categories.map { recommendation in
+                Category(
+                    id: UUID(),
+                    name: recommendation.name,
+                    allocatedAmount: recommendation.allocatedAmount,
+                    periodicity: recommendation.periodicity,
+                    createdAt: Date(),
+                    userId: userId
+                )
+            }
+
+            try await supabaseService.getClient()
+                .from("categories")
+                .insert(newCategories)
+                .execute()
         }
-        
-        try await supabaseService.getClient()
-            .from("categories")
-            .insert(newCategories)
-            .execute()
-        
-        // Refresh categories after bulk insert
-        try await fetchAllData()
-    }
     
     // Bulk update categories
     func updateCategories(_ categories: [Category]) async throws {
@@ -140,5 +144,12 @@ final class AppDataViewModel: ObservableObject {
         
         // Refresh transactions after adding a new one
         try await fetchAllData()
+    }
+    
+    func createUsersProfiel(_ Profile: Profile) async throws {
+        try await supabaseService.getClient()
+            .from("profiles")
+            .insert(Profile)
+            .execute()
     }
 }

@@ -99,20 +99,8 @@ struct CustomPicker<SelectionValue, Content>: View where SelectionValue == Conte
             }
             .padding(.top, 5)
         }
-        .padding(.horizontal, 12)
         .opacity(isEnabled ? 1.0 : 0.6)
         .animation(.easeInOut(duration: 0.12), value: isPicking)
         .zIndex(1)
     }
-}
-
-#Preview {
-    VStack {
-        CustomPicker(selection: .constant(nil)) {
-            Periodicity.allCases
-        }
-    }
-    .preferredColorScheme(.dark)
-    .frame(width: 280, height: 280, alignment: .top)
-    .padding()
 }

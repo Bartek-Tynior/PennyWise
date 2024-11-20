@@ -122,24 +122,29 @@ struct SectionView: View {
     let categories: [Category]
     let helperViewModel: HelperViewModel
     
+    // Fixed width constant for the category column
+    let categoryColumnWidth: CGFloat = 120
+    
     var body: some View {
         VStack(alignment: .leading) {
             // Header
-            HStack {
+            HStack(spacing: 20) {
                 VStack(alignment: .leading) {
                     Text(title)
                         .font(.system(size: 16))
                         .foregroundColor(.gray)
                     Text("\(daysLeft) days left")
                 }
-                Spacer()
+                .frame(maxWidth: .infinity)
+                                
                 VStack(alignment: .trailing) {
                     Text("Budgeted")
                         .font(.system(size: 16))
                         .foregroundColor(.gray)
                     Text("$\(totalBudgeted, specifier: "%.2f")")
                 }
-                Spacer()
+                .frame(maxWidth: .infinity)
+                                
                 VStack(alignment: .trailing) {
                     Text("Left")
                         .font(.system(size: 16))
@@ -147,7 +152,10 @@ struct SectionView: View {
                     Text("$\(totalLeft, specifier: "%.2f")")
                         .foregroundColor(totalLeft >= 0 ? .green : .red)
                 }
+                .frame(maxWidth: .infinity)
+
             }
+            .frame(maxWidth: .infinity)
             .padding(.vertical, 8)
             .padding(.horizontal)
             .background(Color.gray.opacity(0.2))
@@ -159,11 +167,13 @@ struct SectionView: View {
                 ForEach(categories) { category in
                     let remainingBalance = helperViewModel.categoryBalances[category.id!] ?? category.allocatedAmount
                     
-                    HStack {
+                    HStack(spacing: 20) {
                         Text(category.name)
-                        Spacer()
+                            .frame(maxWidth: .infinity)
+                        
                         Text("$\(category.allocatedAmount, specifier: "%.2f")")
-                        Spacer()
+                            .frame(maxWidth: .infinity)
+                        
                         Text("$\(remainingBalance, specifier: "%.2f")")
                             .foregroundColor(remainingBalance >= 0 ? .green : .red)
                             .background(
@@ -171,6 +181,8 @@ struct SectionView: View {
                                     .fill(remainingBalance >= 0 ? .green.opacity(0.2) : .red.opacity(0.2))
                                     .frame(width: textWidth(for: String(remainingBalance)))
                             )
+                            .frame(maxWidth: .infinity)
+
                     }
                     .padding()
                     .background(RoundedRectangle(cornerRadius: 12).stroke(Color.gray.opacity(0.3), lineWidth: 1))

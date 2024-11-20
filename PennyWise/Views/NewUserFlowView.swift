@@ -11,9 +11,8 @@ struct NewUserFlowView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
     @State private var selectedCategories: [CategoryRecommendation] = []
     @State private var step: SetupSteps = .signup
-    @EnvironmentObject var appDataViewModel: AppDataViewModel
     @State private var isLoading = false
-    
+
     var body: some View {
         VStack {
             if step == .signup {
@@ -33,34 +32,44 @@ struct NewUserFlowView: View {
             } else if step == .welcome {
                 AppIntroView(onFinish: {
                     Task {
-                        try await authViewModel.signUp()
+                        isLoading = true
+                        do {
+                            // Perform signup and profile creation
+                            try await authViewModel.signUp()
+
+                            // Save selected categories
+                            try await saveNewCategories()
+
+                            // Update session state
+                            await authViewModel.checkSession()
+                            print("Signup and profile creation complete")
+                        } catch {
+                            authViewModel.errorMessage = "Signup failed: \(error.localizedDescription)"
+                        }
+                        isLoading = false
                     }
-                        
-                    saveNewCategories()
-                        
-                    Task {
-                        await authViewModel.checkSession()
-                    }
-                    print("Flow successfully completed")
                 }, onPrevious: {
                     step = .allocateBudgets
                 })
+            }
+
+            // Show error messages
+            if let errorMessage = authViewModel.errorMessage {
+                Text("Error: \(errorMessage)")
+                    .foregroundColor(.red)
+                    .padding()
+            }
+
+            if isLoading {
+                ProgressView("Loading...")
             }
         }
         .background(Color.black.opacity(0.9).edgesIgnoringSafeArea(.all))
         .foregroundColor(.white)
     }
-    
-    private func saveNewCategories() {
-        Task {
-            try? await appDataViewModel.addNewCategories(selectedCategories)
-        }
+
+    private func saveNewCategories() async throws {
+        try await AppDataViewModel().addNewCategories(selectedCategories)
     }
 }
 
-enum SetupSteps {
-    case signup
-    case selectCategories
-    case allocateBudgets
-    case welcome
-}

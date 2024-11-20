@@ -8,7 +8,7 @@
 import Foundation
 
 struct Profile: Identifiable, Codable, Equatable {
-    var id: Int
+    var id: Int?
     var userId: UUID
     var name: String
     var email: String

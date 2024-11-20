@@ -90,7 +90,7 @@ struct CategoryRowSetupView: View {
                     .foregroundStyle(.white)
             }
 
-            HStack(spacing: 0) {
+            HStack(spacing: 10) {
                 TextField("Allocated Amount", value: $category.allocatedAmount, format: .number)
                     .font(.headline)
                     .padding()
