@@ -112,7 +112,6 @@ struct AddCategoryView: View {
             return
         }
         
-        
         let category = Category(
             id: UUID(),
             name: categoryName,

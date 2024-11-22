@@ -114,5 +114,25 @@ class AuthViewModel: ObservableObject {
         let passwordRegex = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*\\.).{8,}$"
         return password.range(of: passwordRegex, options: .regularExpression) != nil
     }
+    
+    func updateProfile(_ profile: Profile) async throws {
+        do {
+            try await supabaseService.getClient()
+                .from("profiles")
+                .update([
+                    "name": profile.name,
+                    "email": profile.email,
+                    "chosen_currency": profile.chosenCurrency
+                ])
+                .eq("user_id", value: profile.userId)
+                .execute()
+            
+            // Optionally refresh the profile
+            try await fetchUserProfile()
+        } catch {
+            handleError(error)
+            throw error
+        }
+    }
 }
 

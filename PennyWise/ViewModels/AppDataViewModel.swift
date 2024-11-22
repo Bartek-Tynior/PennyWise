@@ -14,44 +14,44 @@ final class AppDataViewModel: ObservableObject {
     @Published var transactions = [Transaction]()
     
     private let supabaseService = SupabaseService.shared
-
-    // Fetch both categories and transactions for the current user
+    
+    // Fetch all data: categories and transactions
     func fetchAllData() async throws {
         async let categories = fetchCategories()
         async let transactions = fetchTransactions()
         
-        // Await both calls and update data accordingly
+        // Assign fetched data to @Published properties
         self.categories = try await categories
         self.transactions = try await transactions
     }
     
     // Fetch categories for the current user
-    private func fetchCategories() async throws -> [Category] {
+    func fetchCategories() async throws -> [Category] {
         guard let userId = supabaseService.getClient().auth.currentUser?.id else {
             print("Error: User not authenticated.")
             return []
         }
-        
+
         let categories: [Category] = try await supabaseService.getClient()
             .from("categories")
             .select()
-            .eq("user_id", value: userId) // Filter by user ID
+            .eq("user_id", value: userId)
             .execute()
             .value
         return categories
     }
     
     // Fetch transactions for the current user
-    private func fetchTransactions() async throws -> [Transaction] {
+    func fetchTransactions() async throws -> [Transaction] {
         guard let userId = supabaseService.getClient().auth.currentUser?.id else {
             print("Error: User not authenticated.")
             return []
         }
-        
+
         let transactions: [Transaction] = try await supabaseService.getClient()
             .from("transactions")
             .select()
-            .eq("user_id", value: userId) // Filter by user ID
+            .eq("user_id", value: userId)
             .execute()
             .value
         return transactions
@@ -69,35 +69,35 @@ final class AppDataViewModel: ObservableObject {
     }
     
     // Add user profile
-        func createUsersProfile(_ profile: Profile) async throws {
-            try await supabaseService.getClient()
-                .from("profiles")
-                .insert(profile)
-                .execute()
+    func createUsersProfile(_ profile: Profile) async throws {
+        try await supabaseService.getClient()
+            .from("profiles")
+            .insert(profile)
+            .execute()
+    }
+    
+    // Add multiple new categories for a new user
+    func addNewCategories(_ categories: [CategoryRecommendation]) async throws {
+        guard let userId = supabaseService.getClient().auth.currentUser?.id else {
+            throw NSError(domain: "Auth", code: 401, userInfo: [NSLocalizedDescriptionKey: "User not authenticated."])
         }
 
-        // Add multiple new categories for a new user
-        func addNewCategories(_ categories: [CategoryRecommendation]) async throws {
-            guard let userId = supabaseService.getClient().auth.currentUser?.id else {
-                throw NSError(domain: "Auth", code: 401, userInfo: [NSLocalizedDescriptionKey: "User not authenticated."])
-            }
-
-            let newCategories = categories.map { recommendation in
-                Category(
-                    id: UUID(),
-                    name: recommendation.name,
-                    allocatedAmount: recommendation.allocatedAmount,
-                    periodicity: recommendation.periodicity,
-                    createdAt: Date(),
-                    userId: userId
-                )
-            }
-
-            try await supabaseService.getClient()
-                .from("categories")
-                .insert(newCategories)
-                .execute()
+        let newCategories = categories.map { recommendation in
+            Category(
+                id: UUID(),
+                name: recommendation.name,
+                allocatedAmount: recommendation.allocatedAmount,
+                periodicity: recommendation.periodicity,
+                createdAt: Date(),
+                userId: userId
+            )
         }
+
+        try await supabaseService.getClient()
+            .from("categories")
+            .insert(newCategories)
+            .execute()
+    }
     
     // Bulk update categories
     func updateCategories(_ categories: [Category]) async throws {
@@ -141,15 +141,6 @@ final class AppDataViewModel: ObservableObject {
             .from("transactions")
             .insert(transaction)
             .execute()
-        
-        // Refresh transactions after adding a new one
-        try await fetchAllData()
-    }
-    
-    func createUsersProfiel(_ Profile: Profile) async throws {
-        try await supabaseService.getClient()
-            .from("profiles")
-            .insert(Profile)
-            .execute()
     }
 }
+

@@ -15,7 +15,7 @@ struct Profile: Identifiable, Codable, Equatable {
     var createdAt: Date
     var chosenCurrency: String
     
-    // Computed property for working with Periodicity enum
+    // Computed property for working with Currency enum
     var currencyEnum: Currency {
         get {
             Currency(rawValue: chosenCurrency) ?? .usd

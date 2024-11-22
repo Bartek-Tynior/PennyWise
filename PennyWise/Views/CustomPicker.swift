@@ -26,10 +26,9 @@ struct CustomPicker<SelectionValue, Content>: View where SelectionValue == Conte
             selection = item
             isPicking.toggle()
         } label: {
-            Text(item.id.capitalized)
+            Text(item.id)
                 .foregroundColor(.white)
                 .fontWeight(.semibold)
-                .lineLimit(1)
                 .minimumScaleFactor(0.7)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 10)
@@ -52,7 +51,7 @@ struct CustomPicker<SelectionValue, Content>: View where SelectionValue == Conte
 
         // Select Button - Selected item
         HStack {
-            Text(selection?.id.capitalized ?? "Select")
+            Text(selection?.id ?? "Select")
                 .foregroundColor(selection == nil ? .gray : .white)  // Placeholder color like your design
                 .font(.headline)
                 .lineLimit(1)
@@ -89,7 +88,7 @@ struct CustomPicker<SelectionValue, Content>: View where SelectionValue == Conte
                     .padding()
                     .scrollIndicators(.never)
                     .frame(height: 100)  // Adjust height to fit design
-                    .background(Color.gray.opacity(0.2)) // Dark background for dropdown
+                    .background(Color("Secondary")) // Dark background for dropdown
                     .cornerRadius(cornerRadius)
                     .shadow(radius: 4)
                     .transition(.scale(scale: 0.8, anchor: .top)

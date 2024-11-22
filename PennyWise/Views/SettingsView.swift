@@ -39,19 +39,26 @@ struct SettingsView: View {
                 VStack(alignment: .leading, spacing: 10) {
                     Section {
                         TextField("Name", text: $name)
-                            .fontWeight(.semibold)
-                            .padding()
-                            .foregroundStyle(.white)
-                            .background(.gray.opacity(0.2))
-                            .cornerRadius(10)
-                        TextField("Email", text: $email)
-                            .fontWeight(.semibold)
-                            .padding()
-                            .foregroundStyle(.white)
-                            .background(.gray.opacity(0.2))
-                            .cornerRadius(10)
-                            .keyboardType(.emailAddress)
-                            .autocapitalization(.none)
+                                    .fontWeight(.semibold)
+                                    .padding()
+                                    .foregroundStyle(.white)
+                                    .background(.gray.opacity(0.2))
+                                    .cornerRadius(10)
+                                    .onChange(of: name) {
+                                        updateProfile()
+                                    }
+                                
+                                TextField("Email", text: $email)
+                                    .fontWeight(.semibold)
+                                    .padding()
+                                    .foregroundStyle(.white)
+                                    .background(.gray.opacity(0.2))
+                                    .cornerRadius(10)
+                                    .keyboardType(.emailAddress)
+                                    .autocapitalization(.none)
+                                    .onChange(of: email) {
+                                        updateProfile()
+                                    }
 
                         Button {
                             showChangePasswordSheet = true
@@ -76,8 +83,11 @@ struct SettingsView: View {
                         
                     Section {
                         CustomPicker(selection: $selectedCurrency) {
-                            Currency.allCases
-                        }
+                                    Currency.allCases
+                                }
+                                .onChange(of: selectedCurrency) { _ in
+                                    updateProfile()
+                                }
                             
                         Toggle("Reminder Notification", isOn: $reminderActivation)
                             .fontWeight(.semibold)
@@ -188,6 +198,23 @@ struct SettingsView: View {
             name = profile.name
             email = profile.email
             selectedCurrency = Currency.fromString(profile.chosenCurrency) ?? .usd
+        }
+    }
+    
+    private func updateProfile() {
+        guard let currentProfile = authViewModel.profile?.first else { return }
+        var updatedProfile = currentProfile
+        updatedProfile.name = name
+        updatedProfile.email = email
+        updatedProfile.chosenCurrency = selectedCurrency?.rawValue ?? "USD"
+
+        Task {
+            do {
+                try await authViewModel.updateProfile(updatedProfile)
+                try await authViewModel.fetchUserProfile() // Refresh the profile to reflect updates
+            } catch {
+                print("Error updating profile: \(error.localizedDescription)")
+            }
         }
     }
 }

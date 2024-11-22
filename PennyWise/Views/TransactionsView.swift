@@ -8,21 +8,21 @@
 import SwiftUI
 
 struct TransactionsView: View {
-    @State private var selectedTab: String = "All" // Updated default to "All"
+    @EnvironmentObject private var appDataViewModel: AppDataViewModel
+    @State private var selectedTab: String = "All"
     @State private var isShowingTransaction = false
-
-    @StateObject private var appDataViewModel = AppDataViewModel()
 
     // Filtered transactions based on the selected tab
     var filteredTransactions: [Transaction] {
+        let today = Date()
         switch selectedTab {
         case "All Month":
-            return appDataViewModel.transactions.filter { transaction in
-                Calendar.current.isDate(transaction.createdAt, equalTo: Date(), toGranularity: .month)
+            return appDataViewModel.transactions.filter {
+                Calendar.current.isDate($0.createdAt, equalTo: today, toGranularity: .month)
             }
         case "This Week":
-            return appDataViewModel.transactions.filter { transaction in
-                Calendar.current.isDate(transaction.createdAt, equalTo: Date(), toGranularity: .weekOfYear)
+            return appDataViewModel.transactions.filter {
+                Calendar.current.isDate($0.createdAt, equalTo: today, toGranularity: .weekOfYear)
             }
         default: // "All"
             return appDataViewModel.transactions
@@ -31,10 +31,10 @@ struct TransactionsView: View {
 
     // Group filtered transactions by date
     var groupedTransactions: [String: [Transaction]] {
-        Dictionary(grouping: filteredTransactions) { transaction in
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "dd MMMM"
-            return dateFormatter.string(from: transaction.createdAt)
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd MMMM"
+        return Dictionary(grouping: filteredTransactions) {
+            formatter.string(from: $0.createdAt)
         }
     }
 
@@ -44,13 +44,12 @@ struct TransactionsView: View {
                 .font(.title)
                 .bold()
                 .padding(.horizontal)
-            
+
             // Tabs for All, All Month, and This Week
             HStack {
-                TabButton(title: "All", selectedTab: $selectedTab)
-                TabButton(title: "All Month", selectedTab: $selectedTab)
-                TabButton(title: "This Week", selectedTab: $selectedTab)
-
+                ForEach(["All", "All Month", "This Week"], id: \.self) { tab in
+                    TabButton(title: tab, selectedTab: $selectedTab)
+                }
                 Spacer()
             }
             .padding()
@@ -59,19 +58,17 @@ struct TransactionsView: View {
             ScrollView {
                 VStack(spacing: 15) {
                     ForEach(groupedTransactions.keys.sorted(by: >), id: \.self) { date in
-                        // Section for each date
                         VStack(alignment: .leading, spacing: 8) {
-                            Text(date) // Date header, e.g., "28 October"
+                            Text(date)
                                 .font(.headline)
                                 .padding(.leading)
                                 .padding(.top)
 
                             ForEach(groupedTransactions[date]!) { transaction in
                                 HStack {
-                                    // Optional icon for category (replace with actual category icon if available)
                                     Image(systemName: "cart.fill")
                                         .foregroundColor(.purple)
-                                    
+
                                     VStack(alignment: .leading) {
                                         Text(transaction.description)
                                             .font(.subheadline)
@@ -79,33 +76,27 @@ struct TransactionsView: View {
                                     }
 
                                     Spacer()
-                                    
+
                                     Text("$\(transaction.amount, specifier: "%.2f")")
                                         .font(.subheadline)
                                 }
                                 .padding()
-                                .background(RoundedRectangle(cornerRadius: 12).stroke(Color.gray.opacity(0.3), lineWidth: 1))
+                                .background(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                                )
                             }
                         }
                     }
                 }
             }
             .padding(.horizontal)
-            .task {
-                do {
-                    try await appDataViewModel.fetchAllData()
-                } catch {
-                    print("Error fetching transactions: \(error)")
-                }
-            }
 
             // Floating Action Button (FAB)
             ZStack {
                 HStack {
                     Spacer()
-                    Button(action: {
-                        isShowingTransaction.toggle()
-                    }) {
+                    Button(action: { isShowingTransaction.toggle() }) {
                         Image(systemName: "plus")
                             .font(.system(size: 24))
                             .frame(width: 50, height: 50)
@@ -117,8 +108,16 @@ struct TransactionsView: View {
                     .padding(.bottom, 20)
                     .sheet(isPresented: $isShowingTransaction) {
                         AddTransactionFlowView()
+                            .environmentObject(appDataViewModel) // Pass environment object
                     }
                 }
+            }
+        }
+        .task {
+            do {
+                try await appDataViewModel.fetchAllData()
+            } catch {
+                print("Error fetching transactions: \(error)")
             }
         }
     }
