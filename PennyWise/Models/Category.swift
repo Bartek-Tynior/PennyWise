@@ -12,10 +12,10 @@ struct Category: Identifiable, Codable, Hashable {
     var name: String
     var allocatedAmount: Double
     var periodicity: String
+    var emoji: String?
     var createdAt: Date
     var userId: UUID
 
-    // Computed property for working with Periodicity enum
     var periodicityEnum: Periodicity {
         get {
             Periodicity(rawValue: periodicity) ?? .monthly
@@ -26,7 +26,7 @@ struct Category: Identifiable, Codable, Hashable {
     }
 
     enum CodingKeys: String, CodingKey {
-        case id, name, periodicity
+        case id, name, periodicity, emoji // Include the emoji field
         case allocatedAmount = "allocated_amount"
         case createdAt = "created_at"
         case userId = "user_id"

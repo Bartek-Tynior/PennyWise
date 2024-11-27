@@ -128,31 +128,33 @@ struct SectionView: View {
     var body: some View {
         VStack(alignment: .leading) {
             // Header
-            HStack(spacing: 20) {
+            HStack(spacing: 5) {
                 VStack(alignment: .leading) {
                     Text(title)
                         .font(.system(size: 16))
                         .foregroundColor(.gray)
                     Text("\(daysLeft) days left")
                 }
-                .frame(maxWidth: .infinity)
+                .frame(maxWidth: .infinity, alignment: .leading)
                                 
-                VStack(alignment: .trailing) {
-                    Text("Budgeted")
-                        .font(.system(size: 16))
-                        .foregroundColor(.gray)
-                    Text("$\(totalBudgeted, specifier: "%.2f")")
+                HStack(spacing: 5) {
+                    VStack(alignment: .trailing) {
+                        Text("Budgeted")
+                            .font(.system(size: 16))
+                            .foregroundColor(.gray)
+                        Text("$\(totalBudgeted, specifier: "%.2f")")
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                    VStack(alignment: .trailing) {
+                        Text("Left")
+                            .font(.system(size: 16))
+                            .foregroundColor(.gray)
+                        Text("$\(totalLeft, specifier: "%.2f")")
+                            .foregroundColor(totalLeft >= 0 ? .green : .red)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                .frame(maxWidth: .infinity)
-                                
-                VStack(alignment: .trailing) {
-                    Text("Left")
-                        .font(.system(size: 16))
-                        .foregroundColor(.gray)
-                    Text("$\(totalLeft, specifier: "%.2f")")
-                        .foregroundColor(totalLeft >= 0 ? .green : .red)
-                }
-                .frame(maxWidth: .infinity)
 
             }
             .frame(maxWidth: .infinity)
@@ -167,21 +169,27 @@ struct SectionView: View {
                 ForEach(categories) { category in
                     let remainingBalance = helperViewModel.categoryBalances[category.id!] ?? category.allocatedAmount
                     
-                    HStack(spacing: 20) {
-                        Text(category.name)
-                            .frame(maxWidth: .infinity)
+                    HStack(spacing: 5) {
                         
-                        Text("$\(category.allocatedAmount, specifier: "%.2f")")
-                            .frame(maxWidth: .infinity)
-                        
-                        Text("$\(remainingBalance, specifier: "%.2f")")
-                            .foregroundColor(remainingBalance >= 0 ? .green : .red)
-                            .background(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .fill(remainingBalance >= 0 ? .green.opacity(0.2) : .red.opacity(0.2))
-                                    .frame(width: textWidth(for: String(remainingBalance)))
-                            )
-                            .frame(maxWidth: .infinity)
+                        HStack {
+                                    Text(category.emoji ?? "")
+                                    Text(category.name)
+                                }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                        HStack (spacing: 5) {
+                            Text("$\(category.allocatedAmount, specifier: "%.2f")")
+                                .frame(maxWidth: .infinity, alignment: .leading)
+
+                            Text("$\(remainingBalance, specifier: "%.2f")")
+                                .foregroundColor(remainingBalance >= 0 ? .green : .red)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .fill(remainingBalance >= 0 ? .green.opacity(0.2) : .red.opacity(0.2))
+                                        .frame(width: textWidth(for: String(remainingBalance)))
+                                )
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
 
                     }
                     .padding()
