@@ -16,13 +16,11 @@ struct TopNavBar: View {
         HStack {
             HStack(spacing: 0) {
                 Text("Penny")
-                    .font(.system(size: 18))
-                    .fontWeight(.semibold)
+                    .customFont(.semiBold, 18)
                     .foregroundColor(.white)
 
                 Text("Wise.")
-                    .font(.system(size: 18))
-                    .fontWeight(.semibold)
+                    .customFont(.semiBold, 18)
                     .foregroundColor(.purple)
             }
 

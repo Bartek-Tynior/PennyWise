@@ -131,7 +131,7 @@ struct SectionView: View {
             HStack(spacing: 5) {
                 VStack(alignment: .leading) {
                     Text(title)
-                        .font(.system(size: 16))
+                        .customFont(.regular, 16)
                         .foregroundColor(.gray)
                     Text("\(daysLeft) days left")
                 }
@@ -140,7 +140,7 @@ struct SectionView: View {
                 HStack(spacing: 5) {
                     VStack(alignment: .trailing) {
                         Text("Budgeted")
-                            .font(.system(size: 16))
+                            .customFont(.regular, 16)
                             .foregroundColor(.gray)
                         Text("$\(totalBudgeted, specifier: "%.2f")")
                     }
@@ -148,7 +148,7 @@ struct SectionView: View {
 
                     VStack(alignment: .trailing) {
                         Text("Left")
-                            .font(.system(size: 16))
+                            .customFont(.regular, 16)
                             .foregroundColor(.gray)
                         Text("$\(totalLeft, specifier: "%.2f")")
                             .foregroundColor(totalLeft >= 0 ? .green : .red)
