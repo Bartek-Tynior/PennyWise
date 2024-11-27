@@ -8,11 +8,12 @@
 import SwiftUI
 
 struct SelectCategoryView: View {
+    @Binding var selectedAmount: String
     @Binding var selectedCategoryId: String?
-    @Binding var transactionDescription: String // Added description binding
+    @Binding var transactionDescription: String
     var onAddTransaction: () -> Void
     
-    @EnvironmentObject var appDataViewModel: AppDataViewModel // Access categories from view model
+    @EnvironmentObject var appDataViewModel: AppDataViewModel
     
     var body: some View {
         VStack {
@@ -28,7 +29,7 @@ struct SelectCategoryView: View {
                 
                 Spacer()
                 
-                Text("$\(selectedCategoryId ?? "0.00")") // Ensure you display the right value here
+                Text("$\(selectedAmount)")
                     .font(.headline)
                     .bold()
                 
@@ -100,13 +101,9 @@ struct CategoryRow: View {
     
     var body: some View {
         HStack {
-            Image(systemName: "folder") // Placeholder; replace with category icon if available
-                .resizable()
-                .scaledToFit()
-                .frame(width: 40, height: 40)
+            Text(category.emoji ?? "")
             
             Text(category.name) // Display category name
-                .font(.headline)
                 .foregroundColor(.white)
             
             Spacer()

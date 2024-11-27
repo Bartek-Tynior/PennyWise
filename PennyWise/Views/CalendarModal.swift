@@ -36,15 +36,14 @@ struct CalendarModal: View {
                     HStack(spacing: 10) {
                         // Close Button
                         Button(action: {
-                            withAnimation {
-                                isPresented.toggle()
-                            }
+                            // Close the view
+                            isPresented.toggle()
                         }) {
                             Image(systemName: "xmark")
-                                .font(.system(size: 18, weight: .bold))
-                                .foregroundStyle(Color.white.opacity(0.8))
-                                .frame(width: 30, height: 30)
-                                .background(.black.opacity(0.5))
+                                .font(.headline)
+                                .foregroundColor(.gray)
+                                .padding()
+                                .background(Color.gray.opacity(0.2))
                                 .clipShape(Circle())
                         }
                     }

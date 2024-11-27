@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E247A2052CF744C10097AB24 /* MCEmojiPicker in Frameworks */ = {isa = PBXBuildFile; productRef = E247A2042CF744C10097AB24 /* MCEmojiPicker */; };
 		E25DA4FF2CB526EB001DB823 /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = E25DA4FE2CB526EB001DB823 /* Auth */; };
 		E25DA5012CB526EB001DB823 /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = E25DA5002CB526EB001DB823 /* Functions */; };
 		E25DA5032CB526EB001DB823 /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = E25DA5022CB526EB001DB823 /* PostgREST */; };
@@ -36,6 +37,7 @@
 				E25DA5012CB526EB001DB823 /* Functions in Frameworks */,
 				E25DA5092CB526EB001DB823 /* Supabase in Frameworks */,
 				E25DA4FF2CB526EB001DB823 /* Auth in Frameworks */,
+				E247A2052CF744C10097AB24 /* MCEmojiPicker in Frameworks */,
 				E25DA5072CB526EB001DB823 /* Storage in Frameworks */,
 				E25DA5052CB526EB001DB823 /* Realtime in Frameworks */,
 			);
@@ -86,6 +88,7 @@
 				E25DA5042CB526EB001DB823 /* Realtime */,
 				E25DA5062CB526EB001DB823 /* Storage */,
 				E25DA5082CB526EB001DB823 /* Supabase */,
+				E247A2042CF744C10097AB24 /* MCEmojiPicker */,
 			);
 			productName = PennyWise;
 			productReference = E25DA4E22CB52414001DB823 /* PennyWise.app */;
@@ -117,6 +120,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				E25DA4FD2CB526EB001DB823 /* XCRemoteSwiftPackageReference "supabase-swift" */,
+				E247A2032CF744C10097AB24 /* XCRemoteSwiftPackageReference "MCEmojiPicker" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E25DA4E32CB52414001DB823 /* Products */;
@@ -350,6 +354,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		E247A2032CF744C10097AB24 /* XCRemoteSwiftPackageReference "MCEmojiPicker" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/izyumkin/MCEmojiPicker";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.2.3;
+			};
+		};
 		E25DA4FD2CB526EB001DB823 /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/supabase/supabase-swift.git";
@@ -361,6 +373,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		E247A2042CF744C10097AB24 /* MCEmojiPicker */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E247A2032CF744C10097AB24 /* XCRemoteSwiftPackageReference "MCEmojiPicker" */;
+			productName = MCEmojiPicker;
+		};
 		E25DA4FE2CB526EB001DB823 /* Auth */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = E25DA4FD2CB526EB001DB823 /* XCRemoteSwiftPackageReference "supabase-swift" */;

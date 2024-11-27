@@ -66,9 +66,9 @@ struct TransactionsView: View {
 
                             ForEach(groupedTransactions[date]!) { transaction in
                                 HStack {
-                                    Image(systemName: "cart.fill")
-                                        .foregroundColor(.purple)
-
+                                    
+                                    Text(appDataViewModel.categories.first(where: { $0.id == transaction.categoryId })?.emoji ?? "")
+                                    
                                     VStack(alignment: .leading) {
                                         Text(transaction.description)
                                             .font(.subheadline)

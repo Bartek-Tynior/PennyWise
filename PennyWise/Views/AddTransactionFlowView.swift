@@ -27,6 +27,7 @@ struct AddTransactionFlowView: View {
             } else if step == .selectCategory {
                 // Category selection step
                 SelectCategoryView(
+                    selectedAmount: $amount,
                     selectedCategoryId: $selectedCategoryId,
                     transactionDescription: $transactionDescription,
                     onAddTransaction: {
