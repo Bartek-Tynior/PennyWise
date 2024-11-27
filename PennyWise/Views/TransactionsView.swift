@@ -66,19 +66,22 @@ struct TransactionsView: View {
 
                             ForEach(groupedTransactions[date]!) { transaction in
                                 HStack {
-                                    
-                                    Text(appDataViewModel.categories.first(where: { $0.id == transaction.categoryId })?.emoji ?? "")
-                                    
-                                    VStack(alignment: .leading) {
+                                    HStack {
+                                        Text(appDataViewModel.categories.first(where: { $0.id == transaction.categoryId })?.emoji ?? "")
+
                                         Text(transaction.description)
-                                            .font(.subheadline)
-                                            .foregroundColor(.gray)
                                     }
+                                    .frame(maxWidth: .infinity, alignment: .leading)
 
                                     Spacer()
 
                                     Text("$\(transaction.amount, specifier: "%.2f")")
-                                        .font(.subheadline)
+                                        .foregroundColor(.red)
+                                        .background(
+                                            RoundedRectangle(cornerRadius: 12)
+                                                .fill(.red.opacity(0.2))
+                                                .frame(width: textWidth(for: String(transaction.amount)))
+                                        )
                                 }
                                 .padding()
                                 .background(
@@ -140,4 +143,12 @@ struct TabButton: View {
                 .cornerRadius(10)
         }
     }
+}
+
+// Utility function for text width calculation
+func textWidth(for text: String) -> CGFloat {
+    let font = UIFont.systemFont(ofSize: 14)
+    let attributes = [NSAttributedString.Key.font: font]
+    let size = (text as NSString).size(withAttributes: attributes)
+    return size.width + 40
 }

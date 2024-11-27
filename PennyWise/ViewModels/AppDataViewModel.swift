@@ -88,6 +88,7 @@ final class AppDataViewModel: ObservableObject {
                 name: recommendation.name,
                 allocatedAmount: recommendation.allocatedAmount,
                 periodicity: recommendation.periodicity,
+                emoji: recommendation.emoji,
                 createdAt: Date(),
                 userId: userId
             )

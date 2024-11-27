@@ -13,9 +13,9 @@ struct AddCategoryView: View {
     @EnvironmentObject var appDataViewModel: AppDataViewModel
     @State private var categoryName: String = ""
     @State private var allocatedAmount: String = ""
-    @State private var selectedEmoji: String = "🙂" // Default emoji
-    @State private var selectedPeriodicity: Periodicity?
+    @State private var selectedEmoji: String = "🙂"
     @State private var showEmojiPicker = false
+    @State private var selectedPeriodicity: Periodicity?
     
     var body: some View {
         ZStack {

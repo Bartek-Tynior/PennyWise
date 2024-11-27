@@ -10,14 +10,35 @@ import SwiftUI
 struct CategoryRowView: View {
     @Binding var category: Category
     @State private var selectedPeriodicity: Periodicity?
+    @State private var showEmojiPicker = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             HStack(spacing: 20) {
-                Circle()
-                    .fill(Color.purple)
-                    .frame(width: 50)
-                    .overlay(Text("B").font(.title).foregroundColor(.white))
+                // Emoji Picker
+                Button(action: {
+                    showEmojiPicker.toggle()
+                }) {
+                    ZStack {
+                        Circle()
+                            .fill(Color.gray.opacity(0.2))
+                            .frame(width: 50, height: 50)
+                                        
+                        Text(category.emoji)
+                            .font(.system(size: 25))
+                                        
+                        Image(systemName: "pencil")
+                            .font(.system(size: 14))
+                            .foregroundColor(.white)
+                            .padding(4)
+                            .background(Circle().fill(Color.purple))
+                            .offset(x: 20, y: 20)
+                    }
+                }
+                .emojiPicker(
+                    isPresented: $showEmojiPicker,
+                    selectedEmoji: $category.emoji
+                )
 
                 TextField("Category name", text: $category.name)
                     .font(.headline)

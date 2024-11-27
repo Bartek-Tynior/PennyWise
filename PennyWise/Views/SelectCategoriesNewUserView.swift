@@ -14,19 +14,19 @@ struct SelectCategoriesNewUserView: View {
     // Sample categories
     private var foodCategories: [CategoryRecommendation] {
         [
-            CategoryRecommendation(name: "Groceries", allocatedAmount: 0, periodicity: Periodicity.monthly.rawValue)
+            CategoryRecommendation(name: "Groceries", allocatedAmount: 0, emoji: "😀", periodicity: Periodicity.monthly.rawValue)
         ]
     }
 
     private var transportationCategories: [CategoryRecommendation] {
         [
-            CategoryRecommendation(name: "Uber/Lyft", allocatedAmount: 0, periodicity: Periodicity.monthly.rawValue)
+            CategoryRecommendation(name: "Uber/Lyft", allocatedAmount: 0, emoji: "😀", periodicity: Periodicity.monthly.rawValue)
         ]
     }
 
     private var entertainmentCategories: [CategoryRecommendation] {
         [
-            CategoryRecommendation(name: "Going Out", allocatedAmount: 0, periodicity: Periodicity.monthly.rawValue)
+            CategoryRecommendation(name: "Going Out", allocatedAmount: 0, emoji: "😀", periodicity: Periodicity.monthly.rawValue)
         ]
     }
 

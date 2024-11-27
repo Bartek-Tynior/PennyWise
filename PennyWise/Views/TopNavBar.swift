@@ -32,21 +32,21 @@ struct TopNavBar: View {
                 Button(action: {
                     showModal.toggle()
                 }) {
-                    Text("15 Jul - 22 Jul")
-                        .font(.system(size: 18))
-                        .fontWeight(.semibold)
-                        .foregroundColor(.white)
-
-                    Image(systemName: "chevron.down")
+                    Image(systemName: "calendar")
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundColor(.purple)
+                        .frame(width: 30, height: 30)
+                        .background(.purple.opacity(0.2))
+                        .clipShape(Circle())
                 }
 
                 Button(action: {
                     isShowingCategoryManagment.toggle()
                 }) {
                     Image(systemName: "pencil")
-                        .font(.system(size: 12, weight: .bold))
+                        .font(.system(size: 18, weight: .bold))
                         .foregroundColor(.purple)
-                        .frame(width: 24, height: 24)
+                        .frame(width: 30, height: 30)
                         .background(.purple.opacity(0.2))
                         .clipShape(Circle())
                 }

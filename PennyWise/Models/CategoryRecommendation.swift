@@ -11,6 +11,7 @@ struct CategoryRecommendation: Identifiable, Hashable {
     let id = UUID()
     var name: String
     var allocatedAmount: Double
+    var emoji: String
     var periodicity: String
     
     // Computed property for working with Periodicity enum

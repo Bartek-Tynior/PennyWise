@@ -155,7 +155,6 @@ struct SectionView: View {
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
-
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 8)
@@ -170,14 +169,13 @@ struct SectionView: View {
                     let remainingBalance = helperViewModel.categoryBalances[category.id!] ?? category.allocatedAmount
                     
                     HStack(spacing: 5) {
-                        
                         HStack {
-                                    Text(category.emoji ?? "")
-                                    Text(category.name)
-                                }
+                            Text(category.emoji ?? "")
+                            Text(category.name)
+                        }
                         .frame(maxWidth: .infinity, alignment: .leading)
 
-                        HStack (spacing: 5) {
+                        HStack(spacing: 5) {
                             Text("$\(category.allocatedAmount, specifier: "%.2f")")
                                 .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -190,7 +188,6 @@ struct SectionView: View {
                                 )
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         }
-
                     }
                     .padding()
                     .background(RoundedRectangle(cornerRadius: 12).stroke(Color.gray.opacity(0.3), lineWidth: 1))

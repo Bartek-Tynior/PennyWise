@@ -12,7 +12,7 @@ struct Category: Identifiable, Codable, Hashable {
     var name: String
     var allocatedAmount: Double
     var periodicity: String
-    var emoji: String?
+    var emoji: String
     var createdAt: Date
     var userId: UUID
 
